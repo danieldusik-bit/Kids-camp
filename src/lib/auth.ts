@@ -1,7 +1,10 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+import * as bcryptModule from "bcryptjs";
 import { prisma } from "./prisma";
+
+// bcryptjs v3 is ESM — handle both default and named exports
+const bcrypt = (bcryptModule as any).default || bcryptModule;
 
 export const authOptions: NextAuthOptions = {
   providers: [
