@@ -1,38 +1,32 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { createClient } from "@libsql/client";
 
 export async function GET() {
-  try {
-    const url = process.env.TURSO_DATABASE_URL!;
-    const authToken = process.env.TURSO_AUTH_TOKEN;
+  const url = process.env.TURSO_DATABASE_URL || "NOT_SET";
+  const authToken = process.env.TURSO_AUTH_TOKEN;
 
-    const adapter = new PrismaLibSql({
+  // Step 1: Test raw libsql client
+  try {
+    const client = createClient({
       url,
       ...(authToken ? { authToken } : {}),
     });
-
-    const prisma = new PrismaClient({ adapter } as any);
-
-    const user = await prisma.user.findUnique({
-      where: { email: "admin@camp.com" },
-    });
-
-    await prisma.$disconnect();
+    const result = await client.execute("SELECT COUNT(*) as cnt FROM User");
+    const count = result.rows[0]?.cnt;
 
     return NextResponse.json({
       ok: true,
-      userFound: !!user,
-      userId: user?.id,
-      role: user?.role,
-      isActive: user?.isActive,
+      step: "libsql direct query works",
+      userCount: count,
       urlPrefix: url.substring(0, 40),
     });
   } catch (e: any) {
     return NextResponse.json({
+      ok: false,
+      step: "libsql direct query failed",
       error: e.message,
-      name: e.constructor.name,
-      tursoUrl: process.env.TURSO_DATABASE_URL?.substring(0, 40),
+      urlPrefix: url.substring(0, 40),
+      hasToken: !!authToken,
     });
   }
 }
