@@ -1,14 +1,38 @@
 import { NextResponse } from "next/server";
+import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 export async function GET() {
-  const envInfo = {
-    TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL?.substring(0, 40) || "NOT SET",
-    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? "SET (" + process.env.TURSO_AUTH_TOKEN.length + " chars)" : "NOT SET",
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "SET" : "NOT SET",
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL || "NOT SET",
-    DATABASE_URL: process.env.DATABASE_URL?.substring(0, 40) || "NOT SET",
-    NODE_ENV: process.env.NODE_ENV,
-  };
+  try {
+    const url = process.env.TURSO_DATABASE_URL!;
+    const authToken = process.env.TURSO_AUTH_TOKEN;
 
-  return NextResponse.json(envInfo);
+    const adapter = new PrismaLibSql({
+      url,
+      ...(authToken ? { authToken } : {}),
+    });
+
+    const prisma = new PrismaClient({ adapter } as any);
+
+    const user = await prisma.user.findUnique({
+      where: { email: "admin@camp.com" },
+    });
+
+    await prisma.$disconnect();
+
+    return NextResponse.json({
+      ok: true,
+      userFound: !!user,
+      userId: user?.id,
+      role: user?.role,
+      isActive: user?.isActive,
+      urlPrefix: url.substring(0, 40),
+    });
+  } catch (e: any) {
+    return NextResponse.json({
+      error: e.message,
+      name: e.constructor.name,
+      tursoUrl: process.env.TURSO_DATABASE_URL?.substring(0, 40),
+    });
+  }
 }
