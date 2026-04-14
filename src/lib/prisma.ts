@@ -7,6 +7,9 @@ function createPrismaClient() {
   const url = process.env.TURSO_DATABASE_URL || "file:dev.db";
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
+  console.log("[PRISMA] Creating client with URL prefix:", url.substring(0, 30));
+  console.log("[PRISMA] Has auth token:", !!authToken);
+
   const adapter = new PrismaLibSql({
     url,
     ...(authToken ? { authToken } : {}),
