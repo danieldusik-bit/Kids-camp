@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Registration {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  status        String   @default("Новая")
+  childName     String
+  childDOB      String
+  childAge      Int
+  parentName    String
+  parentPhone   String
+  parentEmail   String
+  city          String
+  healthInfo    String
+  internalNotes String   @default("")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("VIEWER")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
