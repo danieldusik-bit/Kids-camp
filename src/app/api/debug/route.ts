@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@libsql/client";
+import { createClient } from "@libsql/client/web";
 
 export async function GET() {
-  const url = process.env.TURSO_DATABASE_URL || "NOT_SET";
+  const rawUrl = process.env.TURSO_DATABASE_URL || "NOT_SET";
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
-  // Step 1: Test raw libsql client
+  // Convert libsql:// to https:// for web client
+  const url = rawUrl.replace(/^libsql:\/\//, "https://");
+
   try {
     const client = createClient({
       url,
@@ -16,17 +18,20 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      step: "libsql direct query works",
+      step: "libsql/web query works!",
       userCount: count,
-      urlPrefix: url.substring(0, 40),
+      urlPrefix: url.substring(0, 50),
+      rawUrlPrefix: rawUrl.substring(0, 50),
     });
   } catch (e: any) {
     return NextResponse.json({
       ok: false,
-      step: "libsql direct query failed",
       error: e.message,
-      urlPrefix: url.substring(0, 40),
-      hasToken: !!authToken,
+      stack: e.stack?.substring(0, 300),
+      urlPrefix: url.substring(0, 50),
+      rawUrlPrefix: rawUrl.substring(0, 50),
+      urlLength: rawUrl.length,
+      authTokenSet: !!authToken,
     });
   }
 }
