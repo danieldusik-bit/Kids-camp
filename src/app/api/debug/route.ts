@@ -1,71 +1,14 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import * as bcryptModule from "bcryptjs";
-
-const bcrypt = (bcryptModule as any).default || bcryptModule;
 
 export async function GET() {
-  try {
-    // First check env vars before any DB call
-    const envInfo = {
-      hasTursoUrl: !!process.env.TURSO_DATABASE_URL,
-      tursoUrlPrefix: process.env.TURSO_DATABASE_URL?.substring(0, 30),
-      hasTursoToken: !!process.env.TURSO_AUTH_TOKEN,
-      hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
-      nextAuthUrl: process.env.NEXTAUTH_URL,
-      databaseUrl: process.env.DATABASE_URL?.substring(0, 30),
-      nodeEnv: process.env.NODE_ENV,
-    };
+  const envInfo = {
+    TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL?.substring(0, 40) || "NOT SET",
+    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? "SET (" + process.env.TURSO_AUTH_TOKEN.length + " chars)" : "NOT SET",
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "SET" : "NOT SET",
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || "NOT SET",
+    DATABASE_URL: process.env.DATABASE_URL?.substring(0, 40) || "NOT SET",
+    NODE_ENV: process.env.NODE_ENV,
+  };
 
-    if (!process.env.TURSO_DATABASE_URL) {
-      return NextResponse.json({ error: "TURSO_DATABASE_URL is not set", envInfo });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: "admin@camp.com" },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found in DB", dbConnected: true });
-    }
-
-    const bcryptKeys = Object.keys(bcrypt);
-    const hasCompare = typeof bcrypt.compare === "function";
-
-    let passwordMatch = false;
-    try {
-      passwordMatch = await bcrypt.compare("Admin1234!", user.passwordHash);
-    } catch (e: any) {
-      return NextResponse.json({
-        error: "bcrypt.compare threw",
-        message: e.message,
-        bcryptKeys,
-        hasCompare,
-        userFound: true,
-        hashPrefix: user.passwordHash?.substring(0, 10),
-      });
-    }
-
-    return NextResponse.json({
-      userFound: true,
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      isActiveType: typeof user.isActive,
-      hashPrefix: user.passwordHash?.substring(0, 10),
-      hashLength: user.passwordHash?.length,
-      passwordMatch,
-      bcryptKeys,
-      hasCompare,
-      envCheck: {
-        hasTursoUrl: !!process.env.TURSO_DATABASE_URL,
-        hasTursoToken: !!process.env.TURSO_AUTH_TOKEN,
-        hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
-        nextAuthUrl: process.env.NEXTAUTH_URL,
-      },
-    });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message, stack: e.stack?.substring(0, 500) });
-  }
+  return NextResponse.json(envInfo);
 }
