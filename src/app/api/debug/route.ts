@@ -6,6 +6,21 @@ const bcrypt = (bcryptModule as any).default || bcryptModule;
 
 export async function GET() {
   try {
+    // First check env vars before any DB call
+    const envInfo = {
+      hasTursoUrl: !!process.env.TURSO_DATABASE_URL,
+      tursoUrlPrefix: process.env.TURSO_DATABASE_URL?.substring(0, 30),
+      hasTursoToken: !!process.env.TURSO_AUTH_TOKEN,
+      hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
+      nextAuthUrl: process.env.NEXTAUTH_URL,
+      databaseUrl: process.env.DATABASE_URL?.substring(0, 30),
+      nodeEnv: process.env.NODE_ENV,
+    };
+
+    if (!process.env.TURSO_DATABASE_URL) {
+      return NextResponse.json({ error: "TURSO_DATABASE_URL is not set", envInfo });
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: "admin@camp.com" },
     });
