@@ -31,7 +31,7 @@ export async function GET() {
       urlPrefix: url.substring(0, 50),
       rawUrlPrefix: rawUrl.substring(0, 50),
       urlLength: rawUrl.length,
-      urlLastChars: JSON.stringify([...rawUrl.slice(-5)].map(c => c.charCodeAt(0))),
+      urlLastChars: JSON.stringify(Array.from(rawUrl.slice(-5)).map(c => c.charCodeAt(0))),
       authTokenSet: !!authToken,
       authTokenLength: authToken?.length,
     });
