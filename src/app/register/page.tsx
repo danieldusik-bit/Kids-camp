@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function RegisterPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -108,20 +109,21 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit}>
           {/* Header Card */}
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl mb-4 overflow-hidden border border-white/50">
-            <div className="h-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-            <div className="p-7">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-4xl">⛺</span>
-                <h1 className="text-[28px] font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Регистрация в детский лагерь 2026
-                </h1>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-4 mb-4">
+            <Image
+              src="/banner.jpeg"
+              alt="Код Приключений — детский лагерь 28 июня - 4 июля"
+              width={1280}
+              height={720}
+              className="w-full h-auto"
+              priority
+            />
+            <div className="p-7 pt-5">
+              <div className="flex flex-wrap gap-2 mb-4">
                 <span className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 text-sm font-medium px-3 py-1.5 rounded-full">
                   👦 7-12 лет
                 </span>
                 <span className="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                  📅 13-18 июля 2026
+                  📅 28 июня - 4 июля 2026
                 </span>
                 <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-sm font-medium px-3 py-1.5 rounded-full">
                   📍 Norkalni
@@ -162,7 +164,7 @@ export default function RegisterPage() {
 
           <FormCard color="blue">
             <FormLabel label="Полный возраст ребенка на момент лагеря" required />
-            <p className="text-xs text-gray-400 mb-2 italic">Возраст на 13 июля 2026</p>
+            <p className="text-xs text-gray-400 mb-2 italic">Возраст на 28 июня 2026</p>
             <input
               type="number"
               name="childAge"
@@ -253,11 +255,10 @@ export default function RegisterPage() {
 
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-md mb-4 p-6 border-l-4 border-amber-400">
             <p className="font-bold text-gray-800 mb-3 text-base">
-              Стоимость лагеря 225&euro; (до 30 июня)*
+              Стоимость лагеря 230&euro;*
             </p>
             <div className="text-sm text-gray-700 space-y-1.5">
-              <p>*Многодетным семьям (Goda &#291;imene 3+) цена 180&euro; за ребенка (до 30 июня)</p>
-              <p>** С 1 июля стоимость лагеря 250&euro;</p>
+              <p>*Многодетным семьям (Goda &#291;imene 3+) цена 180&euro; за ребенка</p>
               <p>*** Отдельная плата за автобус (цена будет известна ближе к лету)</p>
               <div className="h-3"></div>
               <p className="font-medium text-gray-800">Реквизиты для оплаты:</p>
