@@ -124,17 +124,14 @@ export default function RegisterPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16 px-4">
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-10 text-center">
-          <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-green-100 flex items-center justify-center">
-            <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-            Заявка успешно отправлена
+      <div className="min-h-screen bg-gradient-to-br from-sky-200 via-indigo-100 to-amber-100 py-16 px-4 relative overflow-hidden">
+        <FloatingDecorations />
+        <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl border-2 border-green-200 p-10 text-center relative z-10">
+          <div className="text-7xl mb-5">🎉</div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-3">
+            Заявка успешно отправлена!
           </h2>
-          <p className="text-gray-600 mb-2">
+          <p className="text-gray-700 text-lg mb-2">
             Спасибо за регистрацию! Подтверждение отправлено на указанный email.
           </p>
           <p className="text-sm text-gray-500 mb-8">
@@ -145,9 +142,9 @@ export default function RegisterPage() {
               setSubmitted(false);
               setForm(initialState);
             }}
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
           >
-            ← Подать ещё одну заявку
+            Подать ещё одну заявку
           </button>
         </div>
       </div>
@@ -155,10 +152,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-sky-200 via-indigo-100 to-amber-100 relative overflow-hidden">
+      <FloatingDecorations />
+
       {/* Banner */}
-      <div className="max-w-3xl mx-auto px-4 pt-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
+      <div className="max-w-3xl mx-auto px-4 pt-8 relative z-10">
+        <div className="rounded-3xl overflow-hidden shadow-xl border-4 border-white">
           <Image
             src="/banner.jpeg"
             alt="Код Приключений — детский лагерь"
@@ -170,23 +169,34 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto px-4 py-8">
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto px-4 py-8 relative z-10">
         {/* Page heading */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 p-7 mb-5">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 text-sm font-medium px-3 py-1.5 rounded-full">
+              👦 7-12 лет
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-sm font-medium px-3 py-1.5 rounded-full">
+              📅 28 июня - 4 июля 2026
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-sm font-medium px-3 py-1.5 rounded-full">
+              📍 Norkalni
+            </span>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
             Регистрация в лагерь
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Заполните форму, чтобы зарегистрировать ребёнка в детский лагерь
-            «Код Приключений» — 28 июня – 4 июля 2026, Norkalni.
+            «Код Приключений».
           </p>
-          <p className="text-sm text-gray-500 mt-3">
-            Поля, отмеченные <span className="text-red-500">*</span>, обязательны для заполнения.
+          <p className="text-sm text-red-500 font-medium mt-3">
+            * Поля, отмеченные звёздочкой, обязательны для заполнения
           </p>
         </div>
 
         {/* Section: Parent / Guardian */}
-        <Section title="Информация о родителе / опекуне">
+        <Section title="Информация о родителе / опекуне" icon="👨‍👩‍👧" color="purple">
           <Field label="Имя и фамилия" required>
             <input
               type="text"
@@ -239,7 +249,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Child Info */}
-        <Section title="Информация о ребёнке">
+        <Section title="Информация о ребёнке" icon="👧" color="blue">
           <Field label="Имя и фамилия ребёнка" required>
             <input
               type="text"
@@ -316,7 +326,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Billing */}
-        <Section title="Реквизиты для счёта">
+        <Section title="Реквизиты для счёта" icon="🧾" color="amber">
           <Field label="Имя и фамилия / Название компании" required>
             <input
               type="text"
@@ -356,7 +366,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Pickup */}
-        <Section title="Забор ребёнка из лагеря">
+        <Section title="Забор ребёнка из лагеря" icon="🚗" color="cyan">
           <Field
             label="Лица, которым разрешено забирать ребёнка из лагеря"
             hint="Укажите имя, фамилию и связь с ребёнком"
@@ -382,7 +392,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Health */}
-        <Section title="Здоровье">
+        <Section title="Здоровье" icon="🏥" color="green">
           <YesNoToggle
             label="Есть ли у ребёнка аллергии?"
             value={form.hasAllergies}
@@ -433,7 +443,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Physical Activity */}
-        <Section title="Физическая активность">
+        <Section title="Физическая активность" icon="🏃" color="orange">
           <div className="space-y-2">
             {[
               { v: "Разрешено", l: "Разрешено" },
@@ -467,7 +477,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Diet */}
-        <Section title="Питание">
+        <Section title="Питание" icon="🍎" color="red">
           <Field label="Ограничения в питании">
             <div className="space-y-2">
               {[
@@ -503,7 +513,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Additional */}
-        <Section title="Дополнительная информация">
+        <Section title="Дополнительная информация" icon="✨" color="indigo">
           <Field label="Дополнительная информация">
             <textarea
               rows={3}
@@ -530,7 +540,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Payment info */}
-        <Section title="Оплата">
+        <Section title="Оплата" icon="💳" color="amber">
           <div className="text-sm text-gray-700 space-y-2">
             <p>
               <span className="font-medium">Стоимость лагеря:</span> 230&nbsp;€
@@ -539,9 +549,9 @@ export default function RegisterPage() {
               Многодетным семьям (Goda ģimene 3+) — 180&nbsp;€ за ребёнка.
             </p>
             <p className="pt-3 font-medium text-gray-800">Реквизиты для оплаты:</p>
-            <div className="bg-gray-50 rounded-md border border-gray-200 p-4 font-mono text-sm">
-              <div>JK NAMS BIEDRIBA</div>
-              <div className="font-semibold">LV31PARX0033210230002</div>
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-4 font-mono text-sm">
+              <div className="font-semibold">JK NAMS BIEDRIBA</div>
+              <div className="font-bold text-amber-700">LV31PARX0033210230002</div>
               <div className="font-sans text-gray-600 text-xs mt-2">
                 Цель платежа: ZIEDOJUMS bērnu nometnei 2026 + имя и фамилия ребёнка
               </div>
@@ -550,7 +560,7 @@ export default function RegisterPage() {
         </Section>
 
         {/* Section: Confirmations */}
-        <Section title="Подтверждение">
+        <Section title="Подтверждение" icon="✅" color="emerald">
           <Confirm
             checked={form.confirmInfoTrue}
             onChange={(v) => update("confirmInfoTrue", v)}
@@ -574,18 +584,20 @@ export default function RegisterPage() {
         </Section>
 
         {/* Contact */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6">
-          <p className="text-sm font-medium text-gray-800 mb-2">Контакты</p>
-          <div className="text-sm text-gray-600 space-y-1">
+        <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl border-l-4 border-pink-400 shadow-md p-5 mb-6">
+          <p className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            <span className="text-xl">📞</span> Контакты
+          </p>
+          <div className="text-sm text-gray-700 space-y-1">
             <div>
               Дан —{" "}
-              <a href="tel:+37126809250" className="text-blue-600 hover:underline">
+              <a href="tel:+37126809250" className="text-blue-600 hover:underline font-medium">
                 26809250
               </a>
             </div>
             <div>
               Елена —{" "}
-              <a href="tel:+37129164485" className="text-blue-600 hover:underline">
+              <a href="tel:+37129164485" className="text-blue-600 hover:underline font-medium">
                 29164485
               </a>
             </div>
@@ -593,7 +605,7 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-4 mb-6">
+          <div className="bg-red-50 border-2 border-red-300 text-red-700 text-sm rounded-2xl p-4 mb-6 font-medium">
             {error}
           </div>
         )}
@@ -601,18 +613,18 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 rounded-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold py-4 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.02] disabled:hover:scale-100"
         >
-          {loading ? "Отправка..." : "Отправить заявку"}
+          {loading ? "Отправка..." : "🚀 Отправить заявку"}
         </button>
       </form>
 
       <style jsx global>{`
         .input {
           width: 100%;
-          border: 1px solid #d1d5db;
-          border-radius: 6px;
-          padding: 9px 12px;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 10px 14px;
           font-size: 14px;
           color: #111827;
           background: white;
@@ -620,8 +632,8 @@ export default function RegisterPage() {
           transition: border-color 0.15s, box-shadow 0.15s;
         }
         .input:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+          border-color: #818cf8;
+          box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.18);
         }
         .input::placeholder {
           color: #9ca3af;
@@ -654,14 +666,92 @@ export default function RegisterPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  icon,
+  color = "blue",
+  children,
+}: {
+  title: string;
+  icon?: string;
+  color?: string;
+  children: React.ReactNode;
+}) {
+  const stripes: Record<string, string> = {
+    blue: "from-blue-500 to-cyan-500",
+    purple: "from-purple-500 to-pink-500",
+    green: "from-emerald-500 to-teal-500",
+    amber: "from-amber-400 to-orange-500",
+    cyan: "from-cyan-400 to-sky-500",
+    orange: "from-orange-400 to-red-400",
+    red: "from-rose-400 to-pink-500",
+    indigo: "from-indigo-500 to-purple-500",
+    emerald: "from-emerald-500 to-green-600",
+  };
+  const titleGradients: Record<string, string> = {
+    blue: "from-blue-600 to-cyan-600",
+    purple: "from-purple-600 to-pink-600",
+    green: "from-emerald-600 to-teal-600",
+    amber: "from-amber-600 to-orange-600",
+    cyan: "from-cyan-600 to-sky-600",
+    orange: "from-orange-600 to-red-500",
+    red: "from-rose-600 to-pink-600",
+    indigo: "from-indigo-600 to-purple-600",
+    emerald: "from-emerald-600 to-green-700",
+  };
+
   return (
-    <section className="bg-white rounded-lg border border-gray-200 p-6 mb-5">
-      <h2 className="text-lg font-semibold text-gray-900 mb-5 pb-3 border-b border-gray-100">
-        {title}
-      </h2>
-      <div className="space-y-4">{children}</div>
+    <section className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-md hover:shadow-lg transition-shadow duration-200 mb-5 overflow-hidden border border-white/60">
+      <div className={`h-2 bg-gradient-to-r ${stripes[color] || stripes.blue}`}></div>
+      <div className="p-6">
+        <h2 className="flex items-center gap-2.5 mb-5 pb-3 border-b border-dashed border-gray-200">
+          {icon && <span className="text-2xl">{icon}</span>}
+          <span
+            className={`text-xl font-bold bg-gradient-to-r ${titleGradients[color] || titleGradients.blue} bg-clip-text text-transparent`}
+          >
+            {title}
+          </span>
+        </h2>
+        <div className="space-y-4">{children}</div>
+      </div>
     </section>
+  );
+}
+
+function FloatingDecorations() {
+  return (
+    <>
+      <div
+        className="fixed top-8 left-8 text-6xl opacity-20 animate-bounce select-none pointer-events-none"
+        style={{ animationDuration: "3s" }}
+      >
+        🌈
+      </div>
+      <div
+        className="fixed bottom-16 right-8 text-5xl opacity-20 animate-bounce select-none pointer-events-none"
+        style={{ animationDuration: "4s" }}
+      >
+        ⛺
+      </div>
+      <div
+        className="fixed top-1/4 right-16 text-4xl opacity-15 animate-bounce select-none pointer-events-none"
+        style={{ animationDuration: "5s" }}
+      >
+        🌲
+      </div>
+      <div
+        className="fixed bottom-1/3 left-12 text-4xl opacity-15 animate-bounce select-none pointer-events-none"
+        style={{ animationDuration: "3.5s" }}
+      >
+        ☀️
+      </div>
+      <div
+        className="fixed top-2/3 right-1/3 text-3xl opacity-15 animate-bounce select-none pointer-events-none"
+        style={{ animationDuration: "4.5s" }}
+      >
+        🦋
+      </div>
+    </>
   );
 }
 
