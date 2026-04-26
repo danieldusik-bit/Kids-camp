@@ -11,10 +11,32 @@ interface Registration {
   childName: string;
   childDOB: string;
   childAge: number;
+  childPersonalId?: string;
+  childLanguage?: string;
   parentName: string;
   parentPhone: string;
   parentEmail: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
   city: string;
+  billingName?: string;
+  billingId?: string;
+  billingAddress?: string;
+  billingEmail?: string;
+  pickupAuthorized?: string;
+  childCanLeaveAlone?: boolean;
+  hasAllergies?: boolean;
+  allergiesDetails?: string;
+  hasChronicIllness?: boolean;
+  chronicDetails?: string;
+  takesMedication?: boolean;
+  medicationDetails?: string;
+  physicalActivity?: string;
+  physicalLimitations?: string;
+  dietRestrictions?: string;
+  dietDetails?: string;
+  additionalInfo?: string;
+  hearAboutUs?: string;
   healthInfo: string;
   internalNotes: string;
   createdAt: string;
@@ -79,19 +101,85 @@ export default function RegistrationDetailPage() {
           Заявка: {reg.childName}
         </h2>
 
+        <SubHeading>Ребёнок</SubHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Имя и фамилия ребёнка" value={reg.childName} />
+          <Field label="Имя и фамилия" value={reg.childName} />
           <Field label="Дата рождения" value={reg.childDOB} />
           <Field label="Возраст" value={String(reg.childAge)} />
-          <Field label="Имя и фамилия родителя" value={reg.parentName} />
-          <Field label="Телефон родителя" value={reg.parentPhone} />
-          <Field label="Email родителя" value={reg.parentEmail} />
+          <Field label="Персональный код" value={reg.childPersonalId || "—"} />
+          <Field label="Язык общения" value={reg.childLanguage || "—"} />
           <Field label="Город" value={reg.city} />
-          <Field label="Дата подачи" value={new Date(reg.createdAt).toLocaleString("ru-RU")} />
         </div>
 
-        <div className="mt-4">
-          <Field label="Информация о здоровье" value={reg.healthInfo} />
+        <SubHeading>Родитель / Опекун</SubHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Имя и фамилия" value={reg.parentName} />
+          <Field label="Телефон" value={reg.parentPhone} />
+          <Field label="Email" value={reg.parentEmail} />
+          <Field label="Экстренный контакт" value={reg.emergencyContactName || "—"} />
+          <Field label="Телефон экстренного контакта" value={reg.emergencyContactPhone || "—"} />
+        </div>
+
+        <SubHeading>Реквизиты для счёта</SubHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Имя / Компания" value={reg.billingName || "—"} />
+          <Field label="Персональный код / Рег. номер" value={reg.billingId || "—"} />
+          <Field label="Юридический адрес" value={reg.billingAddress || "—"} />
+          <Field label="Email для счёта" value={reg.billingEmail || "—"} />
+        </div>
+
+        <SubHeading>Забор из лагеря</SubHeading>
+        <div className="grid grid-cols-1 gap-4">
+          <Field label="Разрешено забирать" value={reg.pickupAuthorized || "—"} />
+          <Field
+            label="Может покидать лагерь самостоятельно"
+            value={reg.childCanLeaveAlone ? "Да" : "Нет"}
+          />
+        </div>
+
+        <SubHeading>Здоровье</SubHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Аллергии" value={reg.hasAllergies ? `Да — ${reg.allergiesDetails || ""}` : "Нет"} />
+          <Field
+            label="Хронические заболевания"
+            value={reg.hasChronicIllness ? `Да — ${reg.chronicDetails || ""}` : "Нет"}
+          />
+          <Field
+            label="Медикаменты"
+            value={reg.takesMedication ? `Да — ${reg.medicationDetails || ""}` : "Нет"}
+          />
+          <Field
+            label="Физическая активность"
+            value={
+              reg.physicalActivity === "С ограничениями"
+                ? `С ограничениями — ${reg.physicalLimitations || ""}`
+                : reg.physicalActivity || "—"
+            }
+          />
+          {reg.healthInfo && (
+            <div className="md:col-span-2">
+              <Field label="Прочая информация о здоровье" value={reg.healthInfo} />
+            </div>
+          )}
+        </div>
+
+        <SubHeading>Питание</SubHeading>
+        <div className="grid grid-cols-1 gap-4">
+          <Field
+            label="Ограничения"
+            value={
+              reg.dietRestrictions === "другое"
+                ? `Другое — ${reg.dietDetails || ""}`
+                : reg.dietRestrictions || "—"
+            }
+          />
+        </div>
+
+        <SubHeading>Дополнительно</SubHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Дополнительная информация" value={reg.additionalInfo || "—"} />
+          <Field label="Откуда узнали" value={reg.hearAboutUs || "—"} />
+          <Field label="Дата подачи" value={new Date(reg.createdAt).toLocaleString("ru-RU")} />
         </div>
       </div>
 
@@ -176,7 +264,15 @@ function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-sm text-gray-800 mt-0.5">{value}</p>
+      <p className="text-sm text-gray-800 mt-0.5 whitespace-pre-wrap">{value}</p>
     </div>
+  );
+}
+
+function SubHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mt-6 mb-3 first:mt-0">
+      {children}
+    </h3>
   );
 }

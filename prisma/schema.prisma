@@ -8,18 +8,66 @@ datasource db {
 }
 
 model Registration {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now())
-  status        String   @default("Новая")
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  status    String   @default("Новая")
+
+  // Parent / Guardian
+  parentName  String
+  parentPhone String
+  parentEmail String
+
+  // Emergency contact (optional)
+  emergencyContactName  String @default("")
+  emergencyContactPhone String @default("")
+
+  // Child info
   childName     String
   childDOB      String
   childAge      Int
-  parentName    String
-  parentPhone   String
-  parentEmail   String
-  city          String
-  healthInfo    String
-  internalNotes String   @default("")
+  childPersonalId String @default("")
+  childLanguage   String @default("Русский")
+
+  // Location
+  city String
+
+  // Billing details
+  billingName    String @default("")
+  billingId      String @default("")
+  billingAddress String @default("")
+  billingEmail   String @default("")
+
+  // Pickup
+  pickupAuthorized   String  @default("")
+  childCanLeaveAlone Boolean @default(false)
+
+  // Health
+  hasAllergies        Boolean @default(false)
+  allergiesDetails    String  @default("")
+  hasChronicIllness   Boolean @default(false)
+  chronicDetails      String  @default("")
+  takesMedication     Boolean @default(false)
+  medicationDetails   String  @default("")
+  physicalActivity    String  @default("Разрешено")
+  physicalLimitations String  @default("")
+
+  // Diet
+  dietRestrictions String @default("нет")
+  dietDetails      String @default("")
+
+  // Additional
+  additionalInfo String @default("")
+  hearAboutUs    String @default("")
+
+  // Confirmations
+  confirmInfoTrue   Boolean @default(false)
+  confirmFirstAid   Boolean @default(false)
+  confirmRules      Boolean @default(false)
+  confirmPayment    Boolean @default(false)
+
+  // Legacy / general health field kept for compatibility
+  healthInfo    String @default("")
+  internalNotes String @default("")
 }
 
 model User {
