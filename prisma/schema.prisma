@@ -12,6 +12,10 @@ model Registration {
   createdAt DateTime @default(now())
   status    String   @default("Новая")
 
+  // Which camp
+  camp      String   @default("kids")
+  groupWith String   @default("")
+
   // Parent / Guardian
   parentName  String
   parentPhone String

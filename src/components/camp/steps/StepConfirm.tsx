@@ -11,7 +11,7 @@ export function StepConfirm({
   return (
     <div className="animate-fadeUp flex flex-col gap-5">
       <p className="text-[15px] text-ink-soft mt-0 mb-1">
-        Подтвердите, пожалуйста, четыре пункта — и можно отправлять заявку.
+        Подтвердите, пожалуйста, три пункта — и можно отправлять заявку.
       </p>
 
       <div className="flex flex-col gap-2.5">
@@ -35,13 +35,6 @@ export function StepConfirm({
           error={!!errors.confirmRules}
         >
           Я ознакомлен(а) с правилами лагеря и согласен(на) с ними.
-        </CheckRow>
-        <CheckRow
-          checked={data.confirmPaid}
-          onChange={(v) => set("confirmPaid", v)}
-          error={!!errors.confirmPaid}
-        >
-          Я понимаю, что место бронируется только после оплаты счёта.
         </CheckRow>
       </div>
 
@@ -68,13 +61,12 @@ export function StepConfirm({
           />
         </svg>
         <div className="text-[13.5px] leading-[1.5] text-ink-soft">
-          После отправки мы пришлём счёт на{" "}
+          После отправки мы пришлём договор и список необходимых вещей на{" "}
           <strong className="text-ink">
-            {data.billEmail || "указанный e-mail"}
-          </strong>{" "}
-          и подтвердим место в смене 28 июня — 4 июля 2026. Если возникнут
-          вопросы — звоните <strong className="text-ink">Дану 26809250</strong>{" "}
-          или <strong className="text-ink">Елене 29164485</strong>.
+            {data.parentEmail || "указанный e-mail"}
+          </strong>
+          . Если возникнут вопросы — звоните координатору лагеря{" "}
+          <strong className="text-ink">Эсфирь · 27627010</strong>.
         </div>
       </div>
 

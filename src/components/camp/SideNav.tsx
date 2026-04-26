@@ -1,9 +1,14 @@
 "use client";
-import { STEPS, CAMP } from "@/lib/camp/camp";
+import { STEPS, CAMP, CAMPS, type CampId } from "@/lib/camp/camp";
 
-type Props = { current: number; onJump: (i: number) => void };
+type Props = {
+  current: number;
+  onJump: (i: number) => void;
+  campId?: CampId | "";
+};
 
-export function SideNav({ current, onJump }: Props) {
+export function SideNav({ current, onJump, campId }: Props) {
+  const selected = CAMPS.find((c) => c.id === campId);
   return (
     <aside className="lg:sticky lg:top-6 bg-surface rounded-3xl p-[18px] border border-line shadow-[0_4px_16px_rgba(60,40,20,0.04)]">
       <div className="text-[11px] uppercase tracking-[0.12em] text-ink-mute font-bold px-2.5 pb-3">
@@ -72,9 +77,19 @@ export function SideNav({ current, onJump }: Props) {
         })}
       </ol>
       <div className="border-t border-line pt-3.5 flex flex-col gap-2">
-        <Row label="Даты" value={CAMP.dates} />
+        <Row
+          label="Смена"
+          value={selected ? selected.label : "Не выбрана"}
+        />
+        <Row
+          label="Даты"
+          value={selected ? selected.dates : "—"}
+        />
         <Row label="Место" value={CAMP.location} />
-        <Row label="Возраст" value="7 — 14 лет" />
+        <Row
+          label="Возраст"
+          value={selected ? selected.ageRange : "—"}
+        />
       </div>
     </aside>
   );

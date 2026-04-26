@@ -74,17 +74,29 @@ export function StepHealth({
         )}
       </div>
 
-      <Chips
-        label="Физическая активность"
-        value={data.physicalActivity}
-        onChange={(v) =>
-          set("physicalActivity", v as "allowed" | "limited")
-        }
-        options={[
-          { value: "allowed", label: "Без ограничений" },
-          { value: "limited", label: "С ограничениями" },
-        ]}
-      />
+      <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
+        <Chips
+          label="Физическая активность"
+          value={data.physicalActivity}
+          onChange={(v) =>
+            set("physicalActivity", v as "allowed" | "limited")
+          }
+          options={[
+            { value: "allowed", label: "Без ограничений" },
+            { value: "limited", label: "С ограничениями" },
+          ]}
+        />
+        {data.physicalActivity === "limited" && (
+          <div className="animate-slideIn">
+            <Area
+              id="physicalLimitations"
+              value={data.physicalLimitations}
+              onChange={(v) => set("physicalLimitations", v)}
+              placeholder="Опишите ограничения: какие виды активности нельзя, когда нужен перерыв и т. д."
+            />
+          </div>
+        )}
+      </div>
 
       <Chips
         label="Особенности питания"

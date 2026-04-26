@@ -8,6 +8,8 @@ import Link from "next/link";
 
 interface Registration {
   id: string;
+  camp?: string;
+  groupWith?: string;
   childName: string;
   childDOB: string;
   childAge: number;
@@ -42,6 +44,11 @@ interface Registration {
   createdAt: string;
   status: string;
 }
+
+const CAMP_LABEL: Record<string, string> = {
+  kids: "Детский лагерь (28.06 – 4.07)",
+  teens: "Подростковый лагерь (26.07 – 1.08)",
+};
 
 export default function RegistrationDetailPage() {
   const params = useParams();
@@ -101,6 +108,15 @@ export default function RegistrationDetailPage() {
           Заявка: {reg.childName}
         </h2>
 
+        <SubHeading>Лагерь</SubHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field
+            label="Смена"
+            value={CAMP_LABEL[reg.camp || ""] || reg.camp || "—"}
+          />
+          <Field label="В одной группе с" value={reg.groupWith || "—"} />
+        </div>
+
         <SubHeading>Ребёнок</SubHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="Имя и фамилия" value={reg.childName} />
@@ -120,13 +136,17 @@ export default function RegistrationDetailPage() {
           <Field label="Телефон экстренного контакта" value={reg.emergencyContactPhone || "—"} />
         </div>
 
-        <SubHeading>Реквизиты для счёта</SubHeading>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Имя / Компания" value={reg.billingName || "—"} />
-          <Field label="Персональный код / Рег. номер" value={reg.billingId || "—"} />
-          <Field label="Юридический адрес" value={reg.billingAddress || "—"} />
-          <Field label="Email для счёта" value={reg.billingEmail || "—"} />
-        </div>
+        {(reg.billingName || reg.billingId || reg.billingAddress || reg.billingEmail) && (
+          <>
+            <SubHeading>Реквизиты для счёта (старая форма)</SubHeading>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="Имя / Компания" value={reg.billingName || "—"} />
+              <Field label="Персональный код / Рег. номер" value={reg.billingId || "—"} />
+              <Field label="Юридический адрес" value={reg.billingAddress || "—"} />
+              <Field label="Email для счёта" value={reg.billingEmail || "—"} />
+            </div>
+          </>
+        )}
 
         <SubHeading>Забор из лагеря</SubHeading>
         <div className="grid grid-cols-1 gap-4">

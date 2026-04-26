@@ -6,6 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const required = [
+      "camp",
       "parentName",
       "parentPhone",
       "parentEmail",
@@ -13,10 +14,6 @@ export async function POST(request: Request) {
       "childDOB",
       "childAge",
       "city",
-      "billingName",
-      "billingId",
-      "billingAddress",
-      "billingEmail",
     ];
     for (const key of required) {
       if (!body[key] && body[key] !== 0) {
@@ -27,7 +24,7 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!body.confirmInfoTrue || !body.confirmFirstAid || !body.confirmRules || !body.confirmPayment) {
+    if (!body.confirmInfoTrue || !body.confirmFirstAid || !body.confirmRules) {
       return NextResponse.json(
         { error: "Необходимо подтвердить все обязательные пункты" },
         { status: 400 }
@@ -36,6 +33,10 @@ export async function POST(request: Request) {
 
     const registration = await prisma.registration.create({
       data: {
+        // Camp & group
+        camp: body.camp,
+        groupWith: body.groupWith || "",
+
         // Parent / Guardian
         parentName: body.parentName,
         parentPhone: body.parentPhone,
@@ -53,11 +54,11 @@ export async function POST(request: Request) {
         // Location
         city: body.city,
 
-        // Billing
-        billingName: body.billingName,
-        billingId: body.billingId,
-        billingAddress: body.billingAddress,
-        billingEmail: body.billingEmail,
+        // Billing (now optional / unused but kept for backward compatibility)
+        billingName: body.billingName || "",
+        billingId: body.billingId || "",
+        billingAddress: body.billingAddress || "",
+        billingEmail: body.billingEmail || "",
 
         // Pickup
         pickupAuthorized: body.pickupAuthorized || "",
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
         additionalInfo: body.additionalInfo || "",
         hearAboutUs: body.hearAboutUs || "",
 
-        // Confirmations
+        // Confirmations (confirmPayment retained for backward compatibility)
         confirmInfoTrue: !!body.confirmInfoTrue,
         confirmFirstAid: !!body.confirmFirstAid,
         confirmRules: !!body.confirmRules,

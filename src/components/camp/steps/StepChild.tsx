@@ -3,6 +3,7 @@ import { Field } from "../fields/Field";
 import { Chips } from "../fields/Chips";
 import { Area } from "../fields/Area";
 import type { useCampForm } from "@/lib/camp/useCampForm";
+import { CAMPS } from "@/lib/camp/camp";
 
 export function StepChild({
   form,
@@ -10,30 +11,33 @@ export function StepChild({
   form: ReturnType<typeof useCampForm>;
 }) {
   const { data, set, touch, errors, age } = form;
+  const camp = CAMPS.find((c) => c.id === data.camp);
+  const ageLabel = camp ? `Возраст на ${formatStart(camp.startDate)}` : "Возраст";
   return (
     <div className="animate-fadeUp flex flex-col gap-5">
-      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
-        <Field
-          id="childName"
-          label="Имя и фамилия ребёнка"
-          required
-          value={data.childName}
-          onChange={(v) => set("childName", v)}
-          onBlur={() => touch("childName")}
-          error={errors.childName}
-          placeholder="Лев Иванов"
-        />
-        <Field
-          id="childBirth"
-          label="Дата рождения"
-          required
-          type="date"
-          value={data.childBirth}
-          onChange={(v) => set("childBirth", v)}
-          onBlur={() => touch("childBirth")}
-          error={errors.childBirth}
-        />
-      </div>
+      {/* Pre-filled child name (read-only display, but editable if needed) */}
+      <Field
+        id="childName"
+        label="Имя и фамилия ребёнка"
+        required
+        value={data.childName}
+        onChange={(v) => set("childName", v)}
+        onBlur={() => touch("childName")}
+        error={errors.childName}
+        placeholder="Лев Иванов"
+        hint="Заполнено на предыдущем шаге — при необходимости можно поправить."
+      />
+
+      <Field
+        id="childBirth"
+        label="Дата рождения"
+        required
+        type="date"
+        value={data.childBirth}
+        onChange={(v) => set("childBirth", v)}
+        onBlur={() => touch("childBirth")}
+        error={errors.childBirth}
+      />
 
       <div
         className={[
@@ -45,7 +49,7 @@ export function StepChild({
       >
         <div className="flex flex-col gap-0.5">
           <span className="text-[11px] uppercase tracking-[0.12em] text-ink-mute font-bold">
-            Возраст на 28 июня
+            {ageLabel}
           </span>
           <span className="text-[13px] text-ink-soft">
             {age != null
@@ -93,6 +97,15 @@ export function StepChild({
         ]}
       />
 
+      <Field
+        id="groupWith"
+        label="Хочет быть в одной группе с"
+        value={data.groupWith}
+        onChange={(v) => set("groupWith", v)}
+        placeholder="Имя и фамилия друга/подруги"
+        hint="Если ребёнок едет с друзьями — постараемся объединить их в одну группу."
+      />
+
       <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col gap-4">
         <h3 className="font-display text-[19px] font-semibold mt-0 mb-0 text-ink">
           Кто может забирать ребёнка
@@ -115,4 +128,23 @@ export function StepChild({
       </div>
     </div>
   );
+}
+
+function formatStart(iso: string) {
+  const d = new Date(iso);
+  const months = [
+    "января",
+    "февраля",
+    "марта",
+    "апреля",
+    "мая",
+    "июня",
+    "июля",
+    "августа",
+    "сентября",
+    "октября",
+    "ноября",
+    "декабря",
+  ];
+  return `${d.getDate()} ${months[d.getMonth()]}`;
 }

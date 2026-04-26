@@ -3,37 +3,43 @@ import { Banner } from "@/components/camp/Banner";
 import { SideNav } from "@/components/camp/SideNav";
 import { Footer } from "@/components/camp/Footer";
 import { Success } from "@/components/camp/Success";
+import { StepCamp } from "@/components/camp/steps/StepCamp";
 import { StepParent } from "@/components/camp/steps/StepParent";
 import { StepChild } from "@/components/camp/steps/StepChild";
 import { StepHealth } from "@/components/camp/steps/StepHealth";
-import { StepBilling } from "@/components/camp/steps/StepBilling";
+import { StepPayment } from "@/components/camp/steps/StepPayment";
 import { StepConfirm } from "@/components/camp/steps/StepConfirm";
 import { useCampForm } from "@/lib/camp/useCampForm";
 import { CAMP, STEPS } from "@/lib/camp/camp";
 
 const HEADERS = [
   {
-    eyebrow: "Шаг 1 из 5 · Родитель",
-    title: "Контакты родителя",
-    lede: "Эти данные нужны, чтобы связаться с вами по поводу заявки и в дни смены.",
+    eyebrow: "Шаг 1 из 6 · Лагерь",
+    title: "Выберите смену",
+    lede: "В сезоне 2026 проходят два лагеря: для детей и для подростков. Выберите подходящую смену.",
   },
   {
-    eyebrow: "Шаг 2 из 5 · Ребёнок",
-    title: "Кто едет в лагерь",
+    eyebrow: "Шаг 2 из 6 · Родитель",
+    title: "Кто едет и контакты родителя",
+    lede: "Сначала имя ребёнка — оно подставится дальше автоматически. Затем контакты родителя для связи.",
+  },
+  {
+    eyebrow: "Шаг 3 из 6 · Ребёнок",
+    title: "Подробнее о ребёнке",
     lede: "Расскажите про ребёнка — мы соберём группу по возрасту и языку общения.",
   },
   {
-    eyebrow: "Шаг 3 из 5 · Здоровье",
+    eyebrow: "Шаг 4 из 6 · Здоровье",
     title: "Здоровье и привычки",
     lede: "Эта информация видна только медсестре и старшему вожатому. Мы относимся к ней бережно.",
   },
   {
-    eyebrow: "Шаг 4 из 5 · Реквизиты",
-    title: "Оплата и счёт",
-    lede: "Стоимость одной смены. Счёт придёт на e-mail в течение 2 рабочих дней.",
+    eyebrow: "Шаг 5 из 6 · Оплата и правила",
+    title: "Оплата и правила лагеря",
+    lede: "Стоимость смены, реквизиты для оплаты и правила, с которыми важно ознакомиться.",
   },
   {
-    eyebrow: "Шаг 5 из 5 · Подтверждение",
+    eyebrow: "Шаг 6 из 6 · Подтверждение",
     title: "Последний шаг",
     lede: "Проверьте данные и подтвердите согласие, чтобы мы могли забронировать место.",
   },
@@ -64,17 +70,17 @@ export default function RegisterPage() {
             </div>
           </div>
           <a
-            href="tel:+37126809250"
+            href="tel:+37127627010"
             className="text-sm text-ink-soft hover:text-accent-strong transition-colors hidden sm:inline"
           >
-            Помощь · +371 26809250
+            Помощь · Эсфирь 27627010
           </a>
         </div>
 
         <div className="grid lg:grid-cols-[248px_1fr] grid-cols-1 gap-6 lg:gap-8 items-start">
           {/* Sidebar — desktop only */}
           <div className="hidden lg:block">
-            <SideNav current={stepIdx} onJump={goTo} />
+            <SideNav current={stepIdx} onJump={goTo} campId={data.camp} />
           </div>
 
           {/* Mobile step strip */}
@@ -118,11 +124,12 @@ export default function RegisterPage() {
                   </p>
                 </header>
 
-                {stepIdx === 0 && <StepParent form={form} />}
-                {stepIdx === 1 && <StepChild form={form} />}
-                {stepIdx === 2 && <StepHealth form={form} />}
-                {stepIdx === 3 && <StepBilling form={form} />}
-                {stepIdx === 4 && <StepConfirm form={form} />}
+                {stepIdx === 0 && <StepCamp form={form} />}
+                {stepIdx === 1 && <StepParent form={form} />}
+                {stepIdx === 2 && <StepChild form={form} />}
+                {stepIdx === 3 && <StepHealth form={form} />}
+                {stepIdx === 4 && <StepPayment form={form} />}
+                {stepIdx === 5 && <StepConfirm form={form} />}
 
                 <Footer
                   stepIdx={stepIdx}

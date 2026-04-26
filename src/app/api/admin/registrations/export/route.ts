@@ -12,6 +12,8 @@ export async function GET() {
   });
 
   const headers = [
+    "Лагерь",
+    "В одной группе с",
     "Имя ребёнка",
     "Дата рождения",
     "Возраст",
@@ -48,6 +50,12 @@ export async function GET() {
   ];
 
   const rows = registrations.map((r: any) => [
+    r.camp === "teens"
+      ? "Подростковый (26.07 – 1.08)"
+      : r.camp === "kids"
+      ? "Детский (28.06 – 4.07)"
+      : r.camp || "",
+    r.groupWith,
     r.childName,
     r.childDOB,
     r.childAge,

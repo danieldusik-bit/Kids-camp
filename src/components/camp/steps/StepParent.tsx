@@ -10,10 +10,31 @@ export function StepParent({
   const { data, set, touch, errors } = form;
   return (
     <div className="animate-fadeUp flex flex-col gap-5">
+      {/* Child name first */}
+      <div className="bg-accent-soft/40 rounded-2xl p-5 border border-accent-soft">
+        <h3 className="font-display text-[19px] font-semibold mt-0 mb-1 text-ink">
+          Кто едет в лагерь
+        </h3>
+        <p className="text-[13px] text-ink-soft mt-0 mb-4">
+          Имя ребёнка появится в его профиле автоматически.
+        </p>
+        <Field
+          id="childName"
+          label="Имя и фамилия ребёнка"
+          required
+          value={data.childName}
+          onChange={(v) => set("childName", v)}
+          onBlur={() => touch("childName")}
+          error={errors.childName}
+          placeholder="Лев Иванов"
+        />
+      </div>
+
+      {/* Parent contacts */}
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
         <Field
           id="parentName"
-          label="Имя и фамилия"
+          label="Имя и фамилия родителя"
           required
           value={data.parentName}
           onChange={(v) => set("parentName", v)}
@@ -49,6 +70,7 @@ export function StepParent({
         placeholder="anna@example.com"
         autoComplete="email"
         inputMode="email"
+        hint="На этот адрес мы пришлём договор и список вещей."
       />
 
       <div className="bg-tint rounded-2xl p-5 border border-line">

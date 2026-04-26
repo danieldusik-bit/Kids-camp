@@ -6,6 +6,7 @@ import Link from "next/link";
 
 interface Registration {
   id: string;
+  camp?: string;
   childName: string;
   childDOB: string;
   childAge: number;
@@ -16,6 +17,22 @@ interface Registration {
   healthInfo: string;
   createdAt: string;
   status: string;
+}
+
+function CampBadge({ camp }: { camp?: string }) {
+  if (camp === "teens")
+    return (
+      <span className="px-2 py-1 rounded-full text-[11px] font-medium bg-orange-100 text-orange-800 whitespace-nowrap">
+        🔥 Подростки
+      </span>
+    );
+  if (camp === "kids")
+    return (
+      <span className="px-2 py-1 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 whitespace-nowrap">
+        🏕️ Дети
+      </span>
+    );
+  return <span className="text-xs text-gray-400">—</span>;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -96,6 +113,7 @@ export default function RegistrationsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-3 py-3 text-left text-gray-600 font-medium">Лагерь</th>
               <th className="px-3 py-3 text-left text-gray-600 font-medium">Имя ребёнка</th>
               <th className="px-3 py-3 text-left text-gray-600 font-medium">Дата рождения</th>
               <th className="px-3 py-3 text-left text-gray-600 font-medium">Возраст</th>
@@ -111,19 +129,20 @@ export default function RegistrationsPage() {
           <tbody className="divide-y">
             {loading ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
                   Загрузка...
                 </td>
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
                   {search ? "Ничего не найдено" : "Заявок пока нет"}
                 </td>
               </tr>
             ) : (
               filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50 cursor-pointer">
+                  <td className="px-3 py-3"><CampBadge camp={r.camp} /></td>
                   <td className="px-3 py-3">
                     <Link href={`/admin/registrations/${r.id}`} className="text-[#1a73e8] hover:underline">
                       {r.childName}

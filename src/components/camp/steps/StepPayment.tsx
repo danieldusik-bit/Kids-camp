@@ -1,23 +1,23 @@
 "use client";
-import { Field } from "../fields/Field";
 import type { useCampForm } from "@/lib/camp/useCampForm";
-import { CAMP } from "@/lib/camp/camp";
+import { CAMP, CAMP_RULES } from "@/lib/camp/camp";
 
-export function StepBilling({
+export function StepPayment({
   form,
 }: {
   form: ReturnType<typeof useCampForm>;
 }) {
-  const { data, set, touch, errors, price } = form;
+  const { data, set, price } = form;
   return (
     <div className="animate-fadeUp flex flex-col gap-5">
+      {/* Pricing card */}
       <div className="rounded-2xl p-6 flex items-center justify-between gap-4 bg-gradient-to-br from-accent-soft to-tint border border-line">
         <div className="flex flex-col gap-0.5">
           <span className="text-[11px] uppercase tracking-[0.12em] text-ink-mute font-bold">
             Стоимость смены
           </span>
           <span className="text-[13px] text-ink-soft">
-            7 дней · полное проживание · все занятия
+            7 дней (5 полных дней) · полное проживание · все занятия
           </span>
         </div>
         <div className="flex items-baseline gap-1.5">
@@ -55,56 +55,14 @@ export function StepBilling({
         </span>
       </label>
 
-      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
-        <Field
-          id="billName"
-          label="Имя или название компании"
-          required
-          value={data.billName}
-          onChange={(v) => set("billName", v)}
-          onBlur={() => touch("billName")}
-          error={errors.billName}
-          placeholder="Анна Иванова или SIA Example"
-        />
-        <Field
-          id="billCode"
-          label="Персональный или регистрационный код"
-          required
-          value={data.billCode}
-          onChange={(v) => set("billCode", v)}
-          onBlur={() => touch("billCode")}
-          error={errors.billCode}
-          placeholder="123456-12345"
-        />
-      </div>
-      <Field
-        id="billAddr"
-        label="Юридический адрес"
-        required
-        value={data.billAddr}
-        onChange={(v) => set("billAddr", v)}
-        onBlur={() => touch("billAddr")}
-        error={errors.billAddr}
-        placeholder="Bīriņu iela 6, Rīga, LV-1011"
-      />
-      <Field
-        id="billEmail"
-        label="E-mail для счёта"
-        required
-        type="email"
-        value={data.billEmail}
-        onChange={(v) => set("billEmail", v)}
-        onBlur={() => touch("billEmail")}
-        error={errors.billEmail}
-        placeholder="invoice@example.com"
-        inputMode="email"
-        hint="Счёт придёт сюда в течение 2 рабочих дней."
-      />
-
+      {/* Payment details */}
       <div className="bg-tint rounded-2xl p-5 border border-line">
         <h3 className="font-display text-[19px] font-semibold mt-0 mb-2 text-ink">
           Реквизиты для оплаты
         </h3>
+        <p className="text-[13px] text-ink-mute mt-0 mb-3">
+          Оплата производится переводом (ziedojums) на счёт организации.
+        </p>
         <div className="bg-surface rounded-xl p-4 font-mono text-[13.5px] text-ink-soft border border-line">
           <div className="font-semibold text-ink">JK NAMS BIEDRIBA</div>
           <div className="font-bold text-accent-strong">
@@ -114,6 +72,30 @@ export function StepBilling({
             Цель платежа: ZIEDOJUMS bērnu nometnei 2026 + имя и фамилия ребёнка
           </div>
         </div>
+      </div>
+
+      {/* Camp rules */}
+      <div className="bg-surface-soft rounded-2xl p-5 border border-line">
+        <h3 className="font-display text-[19px] font-semibold mt-0 mb-2 text-ink">
+          Правила лагеря
+        </h3>
+        <p className="text-[13px] text-ink-mute mt-0 mb-3">
+          Ознакомьтесь с основными правилами вместе с ребёнком — на следующем
+          шаге нужно будет подтвердить согласие с ними.
+        </p>
+        <ul className="flex flex-col gap-2 m-0 p-0 list-none">
+          {CAMP_RULES.map((rule, i) => (
+            <li
+              key={i}
+              className="flex gap-3 text-[14px] text-ink-soft leading-snug"
+            >
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-soft text-accent-strong grid place-items-center font-bold text-[11px] mt-0.5">
+                {i + 1}
+              </span>
+              <span>{rule}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

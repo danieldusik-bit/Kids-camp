@@ -1,11 +1,12 @@
 "use client";
 import { useCallback, useMemo, useState } from "react";
 import {
-  CAMP,
+  CAMPS,
   INITIAL_DATA,
   STEPS,
   type FormData,
   type StepId,
+  type CampId,
 } from "./camp";
 import {
   isDate,
@@ -32,9 +33,14 @@ const ACTIVITY_LABEL: Record<FormData["physicalActivity"], string> = {
   limited: "С ограничениями",
 };
 
-function calcAge(birth: string): number | null {
+function startDateFor(camp: CampId | ""): string {
+  const c = CAMPS.find((x) => x.id === camp);
+  return c?.startDate || CAMPS[0].startDate;
+}
+
+function calcAge(birth: string, campStart: string): number | null {
   if (!isDate(birth)) return null;
-  const start = new Date(CAMP.campStart);
+  const start = new Date(campStart);
   const b = new Date(birth);
   let a = start.getFullYear() - b.getFullYear();
   const m = start.getMonth() - b.getMonth();
@@ -43,8 +49,10 @@ function calcAge(birth: string): number | null {
 }
 
 function toApiPayload(data: FormData) {
-  const age = calcAge(data.childBirth) ?? 0;
+  const age = calcAge(data.childBirth, startDateFor(data.camp)) ?? 0;
   return {
+    camp: data.camp,
+    groupWith: data.groupWith,
     parentName: data.parentName,
     parentPhone: data.parentPhone,
     parentEmail: data.parentEmail,
@@ -56,10 +64,6 @@ function toApiPayload(data: FormData) {
     childPersonalId: data.childCode,
     childLanguage: LANGUAGE_LABEL[data.childLanguage] || data.childLanguage,
     city: data.childCity,
-    billingName: data.billName,
-    billingId: data.billCode,
-    billingAddress: data.billAddr,
-    billingEmail: data.billEmail,
     pickupAuthorized: data.pickupPersons,
     childCanLeaveAlone: data.selfDismissal,
     hasAllergies: data.hasAllergies === "yes",
@@ -69,7 +73,7 @@ function toApiPayload(data: FormData) {
     takesMedication: data.hasMeds === "yes",
     medicationDetails: data.medsText,
     physicalActivity: ACTIVITY_LABEL[data.physicalActivity],
-    physicalLimitations: "",
+    physicalLimitations: data.physicalLimitations,
     dietRestrictions: DIET_LABEL[data.diet],
     dietDetails: data.dietOther,
     additionalInfo: data.notes,
@@ -77,7 +81,7 @@ function toApiPayload(data: FormData) {
     confirmInfoTrue: data.confirmTrue,
     confirmFirstAid: data.confirmFirst,
     confirmRules: data.confirmRules,
-    confirmPayment: data.confirmPaid,
+    confirmPayment: true, // legacy, not collected anymore
     largeFamily: data.largeFamily,
     healthInfo: "",
   };
@@ -107,14 +111,18 @@ export function useCampForm() {
     () => validate(data, touched, false),
     [data, touched]
   );
-  const age = useMemo(() => calcAge(data.childBirth), [data.childBirth]);
+  const campStart = useMemo(() => startDateFor(data.camp), [data.camp]);
+  const age = useMemo(
+    () => calcAge(data.childBirth, campStart),
+    [data.childBirth, campStart]
+  );
 
   const stepId: StepId = STEPS[stepIdx].id;
   const stepValid = useMemo(() => {
     return STEP_REQUIRED[stepId].every((k) => {
       const v = data[k];
       if (typeof v === "boolean") return v;
-      if (k === "parentEmail" || k === "billEmail") return isEmail(v);
+      if (k === "parentEmail") return isEmail(v);
       if (k === "parentPhone") return isPhone(v);
       if (k === "childBirth") return isDate(v);
       return isFilled(v);
@@ -175,7 +183,11 @@ export function useCampForm() {
     }
   }, [data]);
 
-  const price = data.largeFamily ? CAMP.familyPrice : CAMP.basePrice;
+  const price = data.largeFamily ? 180 : 230;
+  const selectedCamp = useMemo(
+    () => CAMPS.find((c) => c.id === data.camp) || null,
+    [data.camp]
+  );
 
   return {
     data,
@@ -185,6 +197,7 @@ export function useCampForm() {
     errors,
     age,
     price,
+    selectedCamp,
     stepIdx,
     stepId,
     stepValid,
