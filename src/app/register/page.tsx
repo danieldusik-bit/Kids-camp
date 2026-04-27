@@ -117,7 +117,10 @@ export default function RegisterPage() {
           </div>
 
           {/* Form card */}
-          <section className="bg-surface rounded-3xl border border-line shadow-[0_4px_24px_rgba(60,40,20,0.05)] p-6 sm:p-9 lg:p-10">
+          <section
+            id="wizard-form"
+            className="bg-surface rounded-3xl border border-line shadow-[0_4px_24px_rgba(60,40,20,0.05)] p-6 sm:p-9 lg:p-10 scroll-mt-4"
+          >
             {submitted ? (
               <Success
                 data={data}

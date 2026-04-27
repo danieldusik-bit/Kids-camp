@@ -53,10 +53,19 @@ function calcAge(birth: string, campStart: string): number | null {
   return a >= 0 && a < 100 ? a : null;
 }
 
-function scrollToTop() {
-  if (typeof window !== "undefined") {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+function scrollToFormTop() {
+  if (typeof window === "undefined") return;
+  // Defer to next frame so the new step has rendered before we measure.
+  requestAnimationFrame(() => {
+    const el = document.getElementById("wizard-form");
+    if (!el) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    const target = Math.max(0, window.scrollY + rect.top - 16);
+    window.scrollTo({ top: target, behavior: "smooth" });
+  });
 }
 
 function toApiPayload(data: FormData) {
@@ -151,16 +160,16 @@ export function useCampForm() {
     });
     if (stepValid) {
       setStepIdx((i) => Math.min(i + 1, STEPS.length - 1));
-      scrollToTop();
+      scrollToFormTop();
     }
   }, [stepIdx, stepValid]);
   const goPrev = useCallback(() => {
     setStepIdx((i) => Math.max(i - 1, 0));
-    scrollToTop();
+    scrollToFormTop();
   }, []);
   const goTo = useCallback((i: number) => {
     setStepIdx(Math.max(0, Math.min(i, STEPS.length - 1)));
-    scrollToTop();
+    scrollToFormTop();
   }, []);
 
   const submit = useCallback(async () => {
@@ -187,7 +196,7 @@ export function useCampForm() {
         throw new Error(j.error || "Не удалось отправить заявку");
       }
       setSubmitted(true);
-      scrollToTop();
+      scrollToFormTop();
     } catch (e: any) {
       setSubmitError(e.message || "Ошибка отправки");
     } finally {
@@ -202,7 +211,7 @@ export function useCampForm() {
     setStepIdx(0);
     setSubmitted(false);
     setSubmitError("");
-    scrollToTop();
+    scrollToFormTop();
   }, []);
 
   /**
@@ -226,7 +235,7 @@ export function useCampForm() {
     setStepIdx(1); // step "parent" — kid name lives there
     setSubmitted(false);
     setSubmitError("");
-    scrollToTop();
+    scrollToFormTop();
   }, []);
 
   const price = data.largeFamily ? 180 : 230;
