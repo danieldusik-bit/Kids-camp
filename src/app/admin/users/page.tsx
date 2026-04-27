@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
+import { Hero } from "@/components/admin/primitives";
 
 interface User {
   id: string;
@@ -117,16 +118,23 @@ export default function UsersPage() {
   if (role !== "SUPERADMIN") return null;
 
   return (
-    <AdminLayout>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">Пользователи</h2>
-        <button
-          onClick={openCreateModal}
-          className="bg-[#1a73e8] hover:bg-[#1557b0] text-white text-sm font-medium px-4 py-2 rounded-md"
-        >
-          Добавить пользователя
-        </button>
-      </div>
+    <AdminLayout
+      hero={
+        <Hero
+          title="Пользователи"
+          subtitle="Администраторы, менеджеры и наставники, имеющие доступ к админ-панели."
+          action={
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="vd-btn vd-btn-primary"
+            >
+              + Добавить пользователя
+            </button>
+          }
+        />
+      }
+    >
 
       <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
         <table className="w-full text-sm">

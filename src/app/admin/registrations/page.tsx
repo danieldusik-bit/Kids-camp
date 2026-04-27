@@ -1,179 +1,158 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import RegistrationModal from "@/components/RegistrationModal";
+import {
+  Hero,
+  Kpi,
+  KpiRow,
+  AppCard,
+} from "@/components/admin/primitives";
 
 interface Registration {
   id: string;
   camp?: string;
   childName: string;
-  childDOB: string;
+  childGender?: string;
   childAge: number;
   parentName: string;
   parentPhone: string;
-  parentEmail: string;
   city: string;
-  healthInfo: string;
   createdAt: string;
   status: string;
 }
 
-function CampBadge({ camp }: { camp?: string }) {
-  if (camp === "teens")
-    return (
-      <span className="px-2 py-1 rounded-full text-[11px] font-medium bg-orange-100 text-orange-800 whitespace-nowrap">
-        🔥 Подростки
-      </span>
-    );
-  if (camp === "kids")
-    return (
-      <span className="px-2 py-1 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 whitespace-nowrap">
-        🏕️ Дети
-      </span>
-    );
-  return <span className="text-xs text-gray-400">—</span>;
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    "Новая": "bg-blue-100 text-blue-800",
-    "Подтверждена": "bg-green-100 text-green-800",
-    "Отклонена": "bg-red-100 text-red-800",
-  };
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status] || "bg-gray-100 text-gray-800"}`}>
-      {status}
-    </span>
-  );
-}
+type StatusFilter = "all" | "Новая" | "Подтверждена" | "Отклонена";
 
 export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<StatusFilter>("all");
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchRegistrations();
-  }, []);
-
-  async function fetchRegistrations() {
+  const refresh = useCallback(async () => {
     setLoading(true);
     const res = await fetch("/api/admin/registrations");
     const data = await res.json();
     setRegistrations(data.registrations || []);
     setLoading(false);
-  }
+  }, []);
 
-  const filtered = registrations.filter((r) => {
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const stats = useMemo(() => {
+    return {
+      total: registrations.length,
+      n: registrations.filter((r) => r.status === "Новая").length,
+      c: registrations.filter((r) => r.status === "Подтверждена").length,
+      r: registrations.filter((r) => r.status === "Отклонена").length,
+    };
+  }, [registrations]);
+
+  const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return (
-      r.childName.toLowerCase().includes(q) ||
-      r.parentName.toLowerCase().includes(q) ||
-      r.city.toLowerCase().includes(q)
-    );
-  });
-
-  async function exportCSV() {
-    const res = await fetch("/api/admin/registrations/export");
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "registrations.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+    return registrations.filter((r) => {
+      if (filter !== "all" && r.status !== filter) return false;
+      if (q) {
+        const hay = `${r.childName} ${r.parentName} ${r.city}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [registrations, search, filter]);
 
   return (
-    <AdminLayout>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">Заявки</h2>
-        <button
-          onClick={exportCSV}
-          className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-md"
-        >
-          Экспорт CSV
-        </button>
-      </div>
+    <AdminLayout
+      hero={
+        <Hero
+          title="Все заявки"
+          subtitle="Заявки из обеих смен."
+          action={
+            <a
+              href="/api/admin/registrations/export"
+              className="vd-btn vd-btn-primary"
+              style={{
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+              }}
+            >
+              Экспорт CSV
+            </a>
+          }
+        />
+      }
+    >
+      <KpiRow>
+        <Kpi label="Всего" value={stats.total} tone="warm" icon="📋" />
+        <Kpi label="Новые" value={stats.n} tone="blue" icon="✨" />
+        <Kpi
+          label="Подтверждённые"
+          value={stats.c}
+          tone="green"
+          icon="✓"
+        />
+        <Kpi label="Отклонённые" value={stats.r} tone="red" icon="!" />
+      </KpiRow>
 
-      {/* Search */}
-      <div className="mb-4">
+      <div className="vd-toolbar">
         <input
-          type="text"
-          placeholder="Поиск по имени ребёнка, родителя или городу..."
+          className="vd-search"
+          style={{ maxWidth: 320, padding: "10px 14px" }}
+          placeholder="Поиск по имени, родителю или городу…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a73e8]"
         />
+        <div className="vd-seg" role="tablist">
+          {([
+            ["all", "Все"],
+            ["Новая", "Новые"],
+            ["Подтверждена", "Подтверждены"],
+            ["Отклонена", "Отклонены"],
+          ] as [StatusFilter, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              className={filter === key ? "vd-seg-on" : ""}
+              onClick={() => setFilter(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Лагерь</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Имя ребёнка</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Дата рождения</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Возраст</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Родитель</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Телефон</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Email</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Город</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Здоровье</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Дата подачи</th>
-              <th className="px-3 py-3 text-left text-gray-600 font-medium">Статус</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {loading ? (
-              <tr>
-                <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
-                  Загрузка...
-                </td>
-              </tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
-                  {search ? "Ничего не найдено" : "Заявок пока нет"}
-                </td>
-              </tr>
-            ) : (
-              filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50 cursor-pointer">
-                  <td className="px-3 py-3"><CampBadge camp={r.camp} /></td>
-                  <td className="px-3 py-3">
-                    <button
-                      type="button"
-                      onClick={() => setOpenId(r.id)}
-                      className="text-[#1a73e8] hover:underline text-left"
-                    >
-                      {r.childName}
-                    </button>
-                  </td>
-                  <td className="px-3 py-3">{r.childDOB}</td>
-                  <td className="px-3 py-3">{r.childAge}</td>
-                  <td className="px-3 py-3">{r.parentName}</td>
-                  <td className="px-3 py-3">{r.parentPhone}</td>
-                  <td className="px-3 py-3">{r.parentEmail}</td>
-                  <td className="px-3 py-3">{r.city}</td>
-                  <td className="px-3 py-3 max-w-[200px] truncate" title={r.healthInfo}>{r.healthInfo}</td>
-                  <td className="px-3 py-3 whitespace-nowrap">{new Date(r.createdAt).toLocaleDateString("ru-RU")}</td>
-                  <td className="px-3 py-3"><StatusBadge status={r.status} /></td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <section className="vd-block">
+        {loading ? (
+          <div className="vd-empty">Загрузка...</div>
+        ) : filtered.length === 0 ? (
+          <div className="vd-empty">
+            {search || filter !== "all"
+              ? "Ничего не найдено по выбранным фильтрам."
+              : "Заявок пока нет."}
+          </div>
+        ) : (
+          <div className="vd-app-list">
+            {filtered.map((r) => (
+              <AppCard
+                key={r.id}
+                application={r}
+                onClick={() => setOpenId(r.id)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
 
       <RegistrationModal
         registrationId={openId}
         onClose={() => setOpenId(null)}
-        onChanged={fetchRegistrations}
-        onDeleted={fetchRegistrations}
+        onChanged={refresh}
+        onDeleted={refresh}
       />
     </AdminLayout>
   );

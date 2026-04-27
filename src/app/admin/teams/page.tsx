@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import AdminLayout from "@/components/AdminLayout";
 import RegistrationModal from "@/components/RegistrationModal";
+import { Hero } from "@/components/admin/primitives";
 
 type Camp = "kids" | "teens";
 type Gender = "boy" | "girl";
@@ -101,7 +102,9 @@ export default function TeamsPage() {
   if (!session) return null;
   if (loading) {
     return (
-      <AdminLayout>
+      <AdminLayout
+        hero={<Hero title="Команды" subtitle="Загрузка..." />}
+      >
         <p className="text-gray-500">Загрузка...</p>
       </AdminLayout>
     );
@@ -118,16 +121,14 @@ export default function TeamsPage() {
     }
 
     return (
-      <AdminLayout>
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Мои команды
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Здесь вы видите детей, назначенных в ваши команды, и всю информацию
-            из их анкет.
-          </p>
-        </div>
+      <AdminLayout
+        hero={
+          <Hero
+            title="Мои команды"
+            subtitle="Здесь вы видите детей, назначенных в ваши команды, и всю информацию из их анкет."
+          />
+        }
+      >
 
         {myTeams.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500">
@@ -254,11 +255,14 @@ export default function TeamsPage() {
   }
 
   return (
-    <AdminLayout>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Команды</h2>
-      </div>
-
+    <AdminLayout
+      hero={
+        <Hero
+          title="Команды"
+          subtitle="Распределите подтверждённых детей по командам и назначьте наставников."
+        />
+      }
+    >
       {/* Camp tabs */}
       <div className="flex gap-2 mb-6">
         {(["kids", "teens"] as Camp[]).map((c) => (

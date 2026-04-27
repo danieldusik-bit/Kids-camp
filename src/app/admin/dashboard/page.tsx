@@ -3,18 +3,21 @@
 import { useEffect, useState, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import RegistrationModal from "@/components/RegistrationModal";
-
-interface Stats {
-  total: number;
-  new: number;
-  confirmed: number;
-  rejected: number;
-}
+import {
+  Hero,
+  Kpi,
+  KpiRow,
+  AppCard,
+  GenderDonut,
+  AgeDonut,
+} from "@/components/admin/primitives";
 
 interface Registration {
   id: string;
   camp?: string;
   childName: string;
+  childGender?: string;
+  childAge: number;
   parentName: string;
   parentPhone: string;
   city: string;
@@ -22,112 +25,104 @@ interface Registration {
   status: string;
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    "Новая": "bg-blue-100 text-blue-800",
-    "Подтверждена": "bg-green-100 text-green-800",
-    "Отклонена": "bg-red-100 text-red-800",
-  };
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status] || "bg-gray-100 text-gray-800"}`}>
-      {status}
-    </span>
-  );
-}
-
-function CampBadge({ camp }: { camp?: string }) {
-  if (camp === "teens")
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-orange-100 text-orange-800 whitespace-nowrap">
-        🔥 Подростковый
-      </span>
-    );
-  if (camp === "kids")
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 whitespace-nowrap">
-        🏕️ Детский
-      </span>
-    );
-  return <span className="text-xs text-gray-400">—</span>;
-}
-
 export default function DashboardPage() {
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [recent, setRecent] = useState<Registration[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    fetch("/api/admin/stats").then((r) => r.json()).then(setStats);
-    fetch("/api/admin/registrations?limit=10")
-      .then((r) => r.json())
-      .then((d) => setRecent(d.registrations || []));
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    const res = await fetch("/api/admin/registrations");
+    const data = await res.json();
+    setRegistrations(data.registrations || []);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
+  const total = registrations.length;
+  const newCnt = registrations.filter((r) => r.status === "Новая").length;
+  const conf = registrations.filter((r) => r.status === "Подтверждена").length;
+  const rej = registrations.filter((r) => r.status === "Отклонена").length;
+
+  const recent = registrations.slice(0, 6);
+
   return (
-    <AdminLayout>
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">Дашборд</h2>
+    <AdminLayout
+      hero={
+        <Hero
+          title="Дашборд"
+          subtitle="Сводка по обоим лагерям и последние заявки."
+        />
+      }
+    >
+      <KpiRow>
+        <Kpi label="Всего заявок" value={total} tone="warm" icon="📋" />
+        <Kpi
+          label="Новые"
+          value={newCnt}
+          tone="blue"
+          icon="✨"
+          hint="ждут обработки"
+        />
+        <Kpi
+          label="Подтверждённые"
+          value={conf}
+          tone="green"
+          icon="✓"
+          hint="оплачены"
+        />
+        <Kpi
+          label="Отклонённые"
+          value={rej}
+          tone="red"
+          icon="!"
+          hint="требуют внимания"
+        />
+      </KpiRow>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Всего заявок" value={stats?.total} color="bg-gray-50" />
-        <StatCard label="Новые заявки" value={stats?.new} color="bg-blue-50" />
-        <StatCard label="Подтверждённые" value={stats?.confirmed} color="bg-green-50" />
-        <StatCard label="Отклонённые" value={stats?.rejected} color="bg-red-50" />
+      <div className="vd-charts">
+        <section className="vd-card">
+          <div className="vd-block-head">
+            <h2>По полу</h2>
+            <span className="vd-mute">все смены</span>
+          </div>
+          <GenderDonut apps={registrations} />
+        </section>
+        <section className="vd-card">
+          <div className="vd-block-head">
+            <h2>По возрасту</h2>
+            <span className="vd-mute">все смены</span>
+          </div>
+          <AgeDonut apps={registrations} />
+        </section>
       </div>
 
-      {/* Recent registrations */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="px-6 py-4 border-b">
-          <h3 className="font-medium text-gray-800">Последние заявки</h3>
+      <section className="vd-block">
+        <div className="vd-block-head">
+          <h2>Последние заявки</h2>
+          <a href="/admin/registrations" className="vd-link">
+            Все →
+          </a>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Имя ребёнка</th>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Смена</th>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Родитель</th>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Телефон</th>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Город</th>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Дата подачи</th>
-                <th className="px-4 py-3 text-left text-gray-600 font-medium">Статус</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {recent.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => setOpenId(r.id)}
-                      className="text-[#1a73e8] hover:underline text-left"
-                    >
-                      {r.childName}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3"><CampBadge camp={r.camp} /></td>
-                  <td className="px-4 py-3">{r.parentName}</td>
-                  <td className="px-4 py-3">{r.parentPhone}</td>
-                  <td className="px-4 py-3">{r.city}</td>
-                  <td className="px-4 py-3">{new Date(r.createdAt).toLocaleDateString("ru-RU")}</td>
-                  <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
-                </tr>
-              ))}
-              {recent.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    Заявок пока нет
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        {loading ? (
+          <div className="vd-empty">Загрузка...</div>
+        ) : recent.length === 0 ? (
+          <div className="vd-empty">Заявок пока нет.</div>
+        ) : (
+          <div className="vd-app-list">
+            {recent.map((r) => (
+              <AppCard
+                key={r.id}
+                application={r}
+                onClick={() => setOpenId(r.id)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
 
       <RegistrationModal
         registrationId={openId}
@@ -136,14 +131,5 @@ export default function DashboardPage() {
         onDeleted={refresh}
       />
     </AdminLayout>
-  );
-}
-
-function StatCard({ label, value, color }: { label: string; value?: number; color: string }) {
-  return (
-    <div className={`${color} rounded-lg p-5`}>
-      <p className="text-sm text-gray-600">{label}</p>
-      <p className="text-3xl font-semibold text-gray-800 mt-1">{value ?? "—"}</p>
-    </div>
   );
 }
