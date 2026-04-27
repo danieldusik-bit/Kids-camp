@@ -65,9 +65,11 @@ export function StepPayment({
           наличными деньгами.
         </p>
         <div className="bg-surface rounded-xl p-4 font-mono text-[13.5px] text-ink-soft border border-line">
-          <div className="font-semibold text-ink">JK NAMS BIEDRIBA</div>
+          <div className="font-semibold text-ink">
+            Rīgas Misiones Baptistu Draudze
+          </div>
           <div className="font-bold text-accent-strong">
-            LV31PARX0033210230002
+            LV80UNLA0050011859310
           </div>
           <div className="font-sans text-ink-mute text-[12.5px] mt-2">
             Цель платежа: ZIEDOJUMS bērnu nometnei 2026 + имя и фамилия ребёнка
