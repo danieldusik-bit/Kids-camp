@@ -73,6 +73,21 @@ model Registration {
   // Legacy / general health field kept for compatibility
   healthInfo    String @default("")
   internalNotes String @default("")
+
+  // Team assignment
+  teamId String?
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  camp      String // "kids" | "teens"
+  gender    String // "boy" | "girl"
+  number    Int // 1..12 (or more)
+  name      String   @default("")
+  leaderId  String? // User id of the mentor leading this team
+
+  @@unique([camp, gender, number])
 }
 
 model User {

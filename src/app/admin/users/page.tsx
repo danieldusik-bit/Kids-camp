@@ -110,6 +110,7 @@ export default function UsersPage() {
   const roleLabels: Record<string, string> = {
     SUPERADMIN: "Суперадмин",
     MANAGER: "Менеджер",
+    MENTOR: "Наставник",
     VIEWER: "Просмотр",
   };
 
@@ -222,6 +223,7 @@ export default function UsersPage() {
                 >
                   <option value="SUPERADMIN">Суперадмин</option>
                   <option value="MANAGER">Менеджер</option>
+                  <option value="MENTOR">Наставник</option>
                   <option value="VIEWER">Просмотр</option>
                 </select>
               </div>

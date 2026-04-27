@@ -8,12 +8,27 @@ export async function GET(request: Request) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const role = (session.user as any)?.role;
+  const userId = (session.user as any)?.id as string | undefined;
+
   const { searchParams } = new URL(request.url);
   const limit = searchParams.get("limit");
   const camp = searchParams.get("camp");
 
   const where: Record<string, unknown> = {};
   if (camp === "kids" || camp === "teens") where.camp = camp;
+
+  // Mentors can only see registrations assigned to teams they lead.
+  if (role === "MENTOR") {
+    if (!userId) return NextResponse.json({ registrations: [] });
+    const myTeams = await prisma.team.findMany({
+      where: { leaderId: userId },
+      select: { id: true },
+    });
+    const teamIds = myTeams.map((t) => t.id);
+    if (teamIds.length === 0) return NextResponse.json({ registrations: [] });
+    where.teamId = { in: teamIds };
+  }
 
   const registrations = await prisma.registration.findMany({
     where,

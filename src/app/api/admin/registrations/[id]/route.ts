@@ -7,11 +7,26 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const role = (session.user as any)?.role;
+  const userId = (session.user as any)?.id as string | undefined;
+
   const registration = await prisma.registration.findUnique({
     where: { id: params.id },
   });
 
   if (!registration) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Mentors can only see registrations assigned to teams they lead.
+  if (role === "MENTOR") {
+    if (!registration.teamId)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const team = await prisma.team.findUnique({
+      where: { id: registration.teamId },
+      select: { leaderId: true },
+    });
+    if (!team || team.leaderId !== userId)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   return NextResponse.json(registration);
 }
@@ -26,11 +41,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   const body = await request.json();
-  const { status, internalNotes } = body;
+  const { status, internalNotes, teamId } = body;
 
   const data: any = {};
   if (status !== undefined) data.status = status;
   if (internalNotes !== undefined) data.internalNotes = internalNotes;
+  if (teamId !== undefined) data.teamId = teamId || null;
 
   const registration = await prisma.registration.update({
     where: { id: params.id },
