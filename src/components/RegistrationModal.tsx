@@ -355,19 +355,67 @@ export default function RegistrationModal({
               <SubHeading>Управление заявкой</SubHeading>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Статус
                   </label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    disabled={!canEdit}
-                    className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a73e8] disabled:bg-gray-100"
-                  >
-                    <option value="Новая">Новая</option>
-                    <option value="Подтверждена">Подтверждена</option>
-                    <option value="Отклонена">Отклонена</option>
-                  </select>
+                  <div className="flex flex-wrap gap-2">
+                    {(
+                      [
+                        {
+                          value: "Новая",
+                          label: "Новая",
+                          bg: "#dbeafe",
+                          fg: "#1e40af",
+                          ring: "#3b82f6",
+                        },
+                        {
+                          value: "Подтверждена",
+                          label: "✓ Подтвердить",
+                          bg: "#d1f0dd",
+                          fg: "#15693a",
+                          ring: "#22c55e",
+                        },
+                        {
+                          value: "Отклонена",
+                          label: "✕ Отклонить",
+                          bg: "#fbdada",
+                          fg: "#a02b2b",
+                          ring: "#ef4444",
+                        },
+                      ] as const
+                    ).map((opt) => {
+                      const active = status === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          disabled={!canEdit}
+                          onClick={() => canEdit && setStatus(opt.value)}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold border-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                          style={
+                            active
+                              ? {
+                                  background: opt.bg,
+                                  color: opt.fg,
+                                  borderColor: opt.ring,
+                                  boxShadow: `0 0 0 3px ${opt.ring}33`,
+                                }
+                              : {
+                                  background: "#fff",
+                                  color: "#5b574d",
+                                  borderColor: "#e5e7eb",
+                                }
+                          }
+                        >
+                          <span
+                            className="inline-block w-2 h-2 rounded-full"
+                            style={{ background: opt.ring }}
+                          />
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div>
