@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import Link from "next/link";
+import RegistrationModal from "@/components/RegistrationModal";
 
 interface Registration {
   id: string;
@@ -52,6 +52,7 @@ export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRegistrations();
@@ -144,9 +145,13 @@ export default function RegistrationsPage() {
                 <tr key={r.id} className="hover:bg-gray-50 cursor-pointer">
                   <td className="px-3 py-3"><CampBadge camp={r.camp} /></td>
                   <td className="px-3 py-3">
-                    <Link href={`/admin/registrations/${r.id}`} className="text-[#1a73e8] hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => setOpenId(r.id)}
+                      className="text-[#1a73e8] hover:underline text-left"
+                    >
                       {r.childName}
-                    </Link>
+                    </button>
                   </td>
                   <td className="px-3 py-3">{r.childDOB}</td>
                   <td className="px-3 py-3">{r.childAge}</td>
@@ -163,6 +168,13 @@ export default function RegistrationsPage() {
           </tbody>
         </table>
       </div>
+
+      <RegistrationModal
+        registrationId={openId}
+        onClose={() => setOpenId(null)}
+        onChanged={fetchRegistrations}
+        onDeleted={fetchRegistrations}
+      />
     </AdminLayout>
   );
 }
