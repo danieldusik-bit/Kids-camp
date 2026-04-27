@@ -50,6 +50,30 @@ export default function AdminLayout({ children, hero }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const [counts, setCounts] = useState<{ all: number; kids: number; teens: number } | null>(null);
+  const [sideOpen, setSideOpen] = useState(false);
+
+  // Close drawer on route change.
+  useEffect(() => {
+    setSideOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll while drawer is open.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (sideOpen) document.body.classList.add("vd-no-scroll");
+    else document.body.classList.remove("vd-no-scroll");
+    return () => document.body.classList.remove("vd-no-scroll");
+  }, [sideOpen]);
+
+  // Close on Escape.
+  useEffect(() => {
+    if (!sideOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSideOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sideOpen]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -136,7 +160,14 @@ export default function AdminLayout({ children, hero }: Props) {
   }
 
   return (
-    <div className="vd-root">
+    <div className={`vd-root ${sideOpen ? "vd-side-open" : ""}`}>
+      {/* Mobile overlay */}
+      <div
+        className="vd-overlay"
+        onClick={() => setSideOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Sidebar */}
       <aside className="vd-side">
         <div className="vd-brand">
@@ -211,6 +242,14 @@ export default function AdminLayout({ children, hero }: Props) {
       {/* Main */}
       <main className="vd-main">
         <header className="vd-topbar">
+          <button
+            type="button"
+            className="vd-menu-btn"
+            onClick={() => setSideOpen(true)}
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
           <div className="vd-search-wrap">
             <span className="vd-search-icon">🔍</span>
             <input
