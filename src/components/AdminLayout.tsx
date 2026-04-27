@@ -7,7 +7,9 @@ import Link from "next/link";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Дашборд" },
-  { href: "/admin/registrations", label: "Заявки" },
+  { href: "/admin/registrations", label: "Все заявки" },
+  { href: "/admin/camps/kids", label: "🏕️ Детский лагерь" },
+  { href: "/admin/camps/teens", label: "🔥 Подростковый лагерь" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

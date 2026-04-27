@@ -5,12 +5,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const limit = searchParams.get("limit");
+  const camp = searchParams.get("camp");
+
+  const where: Record<string, unknown> = {};
+  if (camp === "kids" || camp === "teens") where.camp = camp;
 
   const registrations = await prisma.registration.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     ...(limit ? { take: parseInt(limit) } : {}),
   });
