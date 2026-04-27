@@ -2,7 +2,13 @@
 import type { FormData } from "@/lib/camp/camp";
 import { CAMPS } from "@/lib/camp/camp";
 
-export function Success({ data }: { data: FormData }) {
+type Props = {
+  data: FormData;
+  onReset: () => void;
+  onAddAnother: () => void;
+};
+
+export function Success({ data, onReset, onAddAnother }: Props) {
   const camp = CAMPS.find((c) => c.id === data.camp);
 
   const mailto = (() => {
@@ -10,6 +16,11 @@ export function Success({ data }: { data: FormData }) {
     const lines = [
       `Лагерь: ${camp?.label || ""} (${camp?.dates || ""})`,
       `Ребёнок: ${data.childName}`,
+      data.childGender === "boy"
+        ? "Пол: Мальчик"
+        : data.childGender === "girl"
+        ? "Пол: Девочка"
+        : "",
       data.childBirth ? `Дата рождения: ${data.childBirth}` : "",
       `Город: ${data.childCity}`,
       data.groupWith ? `Хочет в одной группе с: ${data.groupWith}` : "",
@@ -63,11 +74,12 @@ export function Success({ data }: { data: FormData }) {
         <strong className="text-ink">Эсфирь · 27627010</strong>.
       </p>
 
+      {/* Send copy / call */}
       <div className="flex flex-wrap gap-3 justify-center mt-3">
         {data.parentEmail && (
           <a
             href={mailto}
-            className="h-[42px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[14px] bg-accent hover:bg-accent-strong text-white shadow-[0_4px_12px_rgba(179,107,61,0.25)] transition-all"
+            className="h-[42px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[14px] bg-surface-soft hover:bg-tint text-ink-soft border border-line transition-all"
           >
             <svg
               width="16"
@@ -102,6 +114,38 @@ export function Success({ data }: { data: FormData }) {
         >
           📞 Позвонить координатору
         </a>
+      </div>
+
+      {/* Primary actions */}
+      <div className="w-full max-w-[480px] mt-4 pt-5 border-t border-line flex flex-col sm:flex-row gap-3 justify-center">
+        <button
+          type="button"
+          onClick={onAddAnother}
+          className="h-[46px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] bg-accent hover:bg-accent-strong text-white shadow-[0_4px_12px_rgba(179,107,61,0.25)] hover:-translate-y-px transition-all"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 3v10M3 8h10"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+          Добавить ещё одного ребёнка
+        </button>
+        <button
+          type="button"
+          onClick={onReset}
+          className="h-[46px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] bg-surface-soft hover:bg-tint text-ink-soft border border-line transition-all"
+        >
+          Начать новую анкету
+        </button>
       </div>
     </div>
   );

@@ -18,7 +18,6 @@ export const CAMPS: {
   dates: string;
   startDate: string;
   emoji: string;
-  description: string;
 }[] = [
   {
     id: "kids",
@@ -27,7 +26,6 @@ export const CAMPS: {
     dates: "28 июня — 4 июля 2026",
     startDate: "2026-06-28",
     emoji: "🏕️",
-    description: "Семь дней (5 полных дней) приключений в Norkalni для детей.",
   },
   {
     id: "teens",
@@ -36,14 +34,12 @@ export const CAMPS: {
     dates: "26 июля — 1 августа 2026",
     startDate: "2026-07-26",
     emoji: "🔥",
-    description:
-      "Семь дней (5 полных дней) насыщенной программы для подростков.",
   },
 ];
 
 export const CAMP = {
-  name: "Код Приключений",
-  edition: "Смены 2026",
+  name: "Летние лагеря ц. Храм Спасения",
+  edition: "Сезон 2026",
   location: "Norkalni, Latvija",
   basePrice: 230,
   familyPrice: 180,
@@ -57,8 +53,8 @@ export type FormData = {
   emergencyName: string;
   emergencyPhone: string;
   childName: string;
+  childGender: "" | "boy" | "girl";
   childBirth: string;
-  childCode: string;
   childCity: string;
   childLanguage: string;
   groupWith: string;
@@ -90,8 +86,8 @@ export const INITIAL_DATA: FormData = {
   emergencyName: "",
   emergencyPhone: "",
   childName: "",
+  childGender: "",
   childBirth: "",
-  childCode: "",
   childCity: "",
   childLanguage: "Русский",
   groupWith: "",

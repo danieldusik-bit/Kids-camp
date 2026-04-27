@@ -61,7 +61,8 @@ export function StepPayment({
           Реквизиты для оплаты
         </h3>
         <p className="text-[13px] text-ink-mute mt-0 mb-3">
-          Оплата производится переводом (ziedojums) на счёт организации.
+          Оплата производится переводом (ziedojums) на счёт организации или
+          наличными деньгами.
         </p>
         <div className="bg-surface rounded-xl p-4 font-mono text-[13.5px] text-ink-soft border border-line">
           <div className="font-semibold text-ink">JK NAMS BIEDRIBA</div>

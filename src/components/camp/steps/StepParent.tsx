@@ -16,17 +16,19 @@ export function StepParent({
           Кто едет в лагерь
         </h3>
         <p className="text-[13px] text-ink-soft mt-0 mb-4">
-          Имя ребёнка появится в его профиле автоматически.
+          Имя ребёнка появится в его профиле автоматически. Пожалуйста,
+          заполняйте имя и фамилию <strong>на латышском языке</strong> — так,
+          как в документах.
         </p>
         <Field
           id="childName"
-          label="Имя и фамилия ребёнка"
+          label="Имя и фамилия ребёнка (на латышском)"
           required
           value={data.childName}
           onChange={(v) => set("childName", v)}
           onBlur={() => touch("childName")}
           error={errors.childName}
-          placeholder="Лев Иванов"
+          placeholder="Jānis Jansons"
         />
       </div>
 
@@ -34,13 +36,13 @@ export function StepParent({
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
         <Field
           id="parentName"
-          label="Имя и фамилия родителя"
+          label="Имя и фамилия родителя (на латышском)"
           required
           value={data.parentName}
           onChange={(v) => set("parentName", v)}
           onBlur={() => touch("parentName")}
           error={errors.parentName}
-          placeholder="Анна Иванова"
+          placeholder="Aija Bērziņa"
           autoComplete="name"
         />
         <Field
@@ -86,7 +88,7 @@ export function StepParent({
             label="Имя контакта"
             value={data.emergencyName}
             onChange={(v) => set("emergencyName", v)}
-            placeholder="Мария Иванова"
+            placeholder="Marija Ivanova"
           />
           <Field
             id="emergencyPhone"

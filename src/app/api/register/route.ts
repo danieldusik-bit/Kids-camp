@@ -50,6 +50,7 @@ export async function POST(request: Request) {
         childAge: parseInt(body.childAge),
         childPersonalId: body.childPersonalId || "",
         childLanguage: body.childLanguage || "Русский",
+        childGender: body.childGender || "",
 
         // Location
         city: body.city,

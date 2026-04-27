@@ -18,6 +18,11 @@ const DIET_LABEL: Record<FormData["diet"], string> = {
   vegan: "Веган",
   other: "Другое",
 };
+const GENDER_LABEL: Record<FormData["childGender"], string> = {
+  "": "—",
+  boy: "👦 Мальчик",
+  girl: "👧 Девочка",
+};
 
 export function StepConfirm({
   form,
@@ -84,12 +89,12 @@ export function StepConfirm({
           onEdit={() => goTo(2)}
           rows={[
             { label: "Имя и фамилия", value: data.childName || "—" },
+            ...(data.childGender
+              ? [{ label: "Пол", value: GENDER_LABEL[data.childGender] }]
+              : []),
             { label: "Дата рождения", value: data.childBirth || "—" },
             ...(camp
               ? [{ label: `Возраст на ${formatStartShort(camp.startDate)}`, value: ageText }]
-              : []),
-            ...(data.childCode
-              ? [{ label: "Персональный код", value: data.childCode }]
               : []),
             { label: "Город", value: data.childCity || "—" },
             {

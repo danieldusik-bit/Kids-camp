@@ -16,7 +16,7 @@ const HEADERS = [
   {
     eyebrow: "Шаг 1 из 6 · Лагерь",
     title: "Выберите смену",
-    lede: "В сезоне 2026 проходят два лагеря: для детей и для подростков. Выберите подходящую смену.",
+    lede: "",
   },
   {
     eyebrow: "Шаг 2 из 6 · Родитель",
@@ -47,8 +47,18 @@ const HEADERS = [
 
 export default function RegisterPage() {
   const form = useCampForm();
-  const { stepIdx, goNext, goPrev, goTo, submit, submitted, submitting, data } =
-    form;
+  const {
+    stepIdx,
+    goNext,
+    goPrev,
+    goTo,
+    submit,
+    submitted,
+    submitting,
+    data,
+    resetAll,
+    addAnotherChild,
+  } = form;
   const isLast = stepIdx === STEPS.length - 1;
   const head = HEADERS[stepIdx];
 
@@ -60,7 +70,7 @@ export default function RegisterPage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-accent text-white grid place-items-center font-display font-semibold">
-              К
+              Л
             </div>
             <div className="flex flex-col">
               <span className="font-display font-semibold text-lg text-ink leading-none">
@@ -109,7 +119,11 @@ export default function RegisterPage() {
           {/* Form card */}
           <section className="bg-surface rounded-3xl border border-line shadow-[0_4px_24px_rgba(60,40,20,0.05)] p-6 sm:p-9 lg:p-10">
             {submitted ? (
-              <Success data={data} />
+              <Success
+                data={data}
+                onReset={resetAll}
+                onAddAnother={addAnotherChild}
+              />
             ) : (
               <>
                 <header className="mb-7">
@@ -119,9 +133,11 @@ export default function RegisterPage() {
                   <h2 className="font-display text-[28px] sm:text-[32px] font-semibold leading-[1.1] tracking-[-0.01em] text-ink m-0">
                     {head.title}
                   </h2>
-                  <p className="text-[15px] text-ink-soft mt-2.5 mb-0 max-w-[560px]">
-                    {head.lede}
-                  </p>
+                  {head.lede && (
+                    <p className="text-[15px] text-ink-soft mt-2.5 mb-0 max-w-[560px]">
+                      {head.lede}
+                    </p>
+                  )}
                 </header>
 
                 {stepIdx === 0 && <StepCamp form={form} />}

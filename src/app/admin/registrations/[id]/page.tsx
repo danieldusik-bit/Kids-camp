@@ -15,6 +15,7 @@ interface Registration {
   childAge: number;
   childPersonalId?: string;
   childLanguage?: string;
+  childGender?: string;
   parentName: string;
   parentPhone: string;
   parentEmail: string;
@@ -120,9 +121,9 @@ export default function RegistrationDetailPage() {
         <SubHeading>Ребёнок</SubHeading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="Имя и фамилия" value={reg.childName} />
+          <Field label="Пол" value={reg.childGender || "—"} />
           <Field label="Дата рождения" value={reg.childDOB} />
           <Field label="Возраст" value={String(reg.childAge)} />
-          <Field label="Персональный код" value={reg.childPersonalId || "—"} />
           <Field label="Язык общения" value={reg.childLanguage || "—"} />
           <Field label="Город" value={reg.city} />
         </div>

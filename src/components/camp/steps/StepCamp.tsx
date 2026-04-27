@@ -10,11 +10,6 @@ export function StepCamp({
   const { data, set } = form;
   return (
     <div className="animate-fadeUp flex flex-col gap-4">
-      <p className="text-[15px] text-ink-soft mt-0 mb-1">
-        Выберите смену, в которую вы хотите зарегистрировать ребёнка. В сезоне
-        2026 проходят два лагеря.
-      </p>
-
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-3">
         {CAMPS.map((c) => {
           const on = data.camp === c.id;
@@ -81,9 +76,6 @@ export function StepCamp({
                     />
                   </svg>
                   {c.dates}
-                </div>
-                <div className="text-[12.5px] text-ink-mute leading-snug">
-                  {c.description}
                 </div>
               </div>
             </button>

@@ -32,6 +32,11 @@ const ACTIVITY_LABEL: Record<FormData["physicalActivity"], string> = {
   allowed: "Разрешено",
   limited: "С ограничениями",
 };
+const GENDER_LABEL: Record<FormData["childGender"], string> = {
+  "": "",
+  boy: "Мальчик",
+  girl: "Девочка",
+};
 
 function startDateFor(camp: CampId | ""): string {
   const c = CAMPS.find((x) => x.id === camp);
@@ -48,6 +53,12 @@ function calcAge(birth: string, campStart: string): number | null {
   return a >= 0 && a < 100 ? a : null;
 }
 
+function scrollToTop() {
+  if (typeof window !== "undefined") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
 function toApiPayload(data: FormData) {
   const age = calcAge(data.childBirth, startDateFor(data.camp)) ?? 0;
   return {
@@ -59,9 +70,10 @@ function toApiPayload(data: FormData) {
     emergencyContactName: data.emergencyName,
     emergencyContactPhone: data.emergencyPhone,
     childName: data.childName,
+    childGender: GENDER_LABEL[data.childGender] || "",
     childDOB: data.childBirth,
     childAge: age,
-    childPersonalId: data.childCode,
+    childPersonalId: "",
     childLanguage: LANGUAGE_LABEL[data.childLanguage] || data.childLanguage,
     city: data.childCity,
     pickupAuthorized: data.pickupPersons,
@@ -81,7 +93,7 @@ function toApiPayload(data: FormData) {
     confirmInfoTrue: data.confirmTrue,
     confirmFirstAid: data.confirmFirst,
     confirmRules: data.confirmRules,
-    confirmPayment: true, // legacy, not collected anymore
+    confirmPayment: true,
     largeFamily: data.largeFamily,
     healthInfo: "",
   };
@@ -137,18 +149,19 @@ export function useCampForm() {
       });
       return next;
     });
-    if (stepValid)
+    if (stepValid) {
       setStepIdx((i) => Math.min(i + 1, STEPS.length - 1));
+      scrollToTop();
+    }
   }, [stepIdx, stepValid]);
-  const goPrev = useCallback(
-    () => setStepIdx((i) => Math.max(i - 1, 0)),
-    []
-  );
-  const goTo = useCallback(
-    (i: number) =>
-      setStepIdx(Math.max(0, Math.min(i, STEPS.length - 1))),
-    []
-  );
+  const goPrev = useCallback(() => {
+    setStepIdx((i) => Math.max(i - 1, 0));
+    scrollToTop();
+  }, []);
+  const goTo = useCallback((i: number) => {
+    setStepIdx(Math.max(0, Math.min(i, STEPS.length - 1)));
+    scrollToTop();
+  }, []);
 
   const submit = useCallback(async () => {
     const errs = validate(data, {}, true);
@@ -174,14 +187,47 @@ export function useCampForm() {
         throw new Error(j.error || "Не удалось отправить заявку");
       }
       setSubmitted(true);
-      if (typeof window !== "undefined")
-        window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } catch (e: any) {
       setSubmitError(e.message || "Ошибка отправки");
     } finally {
       setSubmitting(false);
     }
   }, [data]);
+
+  /** Full reset — start a fresh new application from scratch. */
+  const resetAll = useCallback(() => {
+    setData(INITIAL_DATA);
+    setTouched({});
+    setStepIdx(0);
+    setSubmitted(false);
+    setSubmitError("");
+    scrollToTop();
+  }, []);
+
+  /**
+   * Add another child — keep parent contacts, camp choice and large-family
+   * toggle; reset only child + health + confirmations.
+   * Jumps the wizard back to the parent step so the child name field is at
+   * the top.
+   */
+  const addAnotherChild = useCallback(() => {
+    setData((d) => ({
+      ...INITIAL_DATA,
+      camp: d.camp,
+      parentName: d.parentName,
+      parentPhone: d.parentPhone,
+      parentEmail: d.parentEmail,
+      emergencyName: d.emergencyName,
+      emergencyPhone: d.emergencyPhone,
+      largeFamily: d.largeFamily,
+    }));
+    setTouched({});
+    setStepIdx(1); // step "parent" — kid name lives there
+    setSubmitted(false);
+    setSubmitError("");
+    scrollToTop();
+  }, []);
 
   const price = data.largeFamily ? 180 : 230;
   const selectedCamp = useMemo(
@@ -208,5 +254,7 @@ export function useCampForm() {
     submitted,
     submitting,
     submitError,
+    resetAll,
+    addAnotherChild,
   };
 }

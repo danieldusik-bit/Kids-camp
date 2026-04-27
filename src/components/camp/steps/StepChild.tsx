@@ -18,14 +18,24 @@ export function StepChild({
       {/* Pre-filled child name (read-only display, but editable if needed) */}
       <Field
         id="childName"
-        label="Имя и фамилия ребёнка"
+        label="Имя и фамилия ребёнка (на латышском)"
         required
         value={data.childName}
         onChange={(v) => set("childName", v)}
         onBlur={() => touch("childName")}
         error={errors.childName}
-        placeholder="Лев Иванов"
+        placeholder="Jānis Jansons"
         hint="Заполнено на предыдущем шаге — при необходимости можно поправить."
+      />
+
+      <Chips
+        label="Пол"
+        value={data.childGender}
+        onChange={(v) => set("childGender", v as "boy" | "girl")}
+        options={[
+          { value: "boy", label: "👦 Мальчик" },
+          { value: "girl", label: "👧 Девочка" },
+        ]}
       />
 
       <Field
@@ -64,26 +74,16 @@ export function StepChild({
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
-        <Field
-          id="childCode"
-          label="Персональный код"
-          value={data.childCode}
-          onChange={(v) => set("childCode", v)}
-          placeholder="123456-12345"
-          hint="Если есть. Поможет с оформлением страховки."
-        />
-        <Field
-          id="childCity"
-          label="Город / посёлок"
-          required
-          value={data.childCity}
-          onChange={(v) => set("childCity", v)}
-          onBlur={() => touch("childCity")}
-          error={errors.childCity}
-          placeholder="Рига"
-        />
-      </div>
+      <Field
+        id="childCity"
+        label="Город / посёлок"
+        required
+        value={data.childCity}
+        onChange={(v) => set("childCity", v)}
+        onBlur={() => touch("childCity")}
+        error={errors.childCity}
+        placeholder="Рига"
+      />
 
       <Chips
         label="Язык общения"
