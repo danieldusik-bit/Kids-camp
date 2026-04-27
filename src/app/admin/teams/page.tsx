@@ -79,6 +79,17 @@ export default function TeamsPage() {
   const [activeCamp, setActiveCamp] = useState<Camp>("kids");
   const [openRegId, setOpenRegId] = useState<string | null>(null);
 
+  // Drag-and-drop: id of the registration currently being dragged.
+  const [draggingRegId, setDraggingRegId] = useState<string | null>(null);
+  // Highlight which drop target is being hovered ("unassigned" or team id).
+  const [dropHover, setDropHover] = useState<string | null>(null);
+
+  // Filters for the "unassigned" section.
+  const [filterGender, setFilterGender] = useState<"all" | Gender>("all");
+  const [filterAge, setFilterAge] = useState<"all" | "7-8" | "9-10" | "11-12" | "13-14" | "15+">(
+    "all"
+  );
+
   const refresh = useCallback(async () => {
     setLoading(true);
     const reqs: Promise<any>[] = [
@@ -331,6 +342,11 @@ export default function TeamsPage() {
                       onAssign={assignChild}
                       onOpenRegistration={(id) => setOpenRegId(id)}
                       canDelete={role === "SUPERADMIN"}
+                      draggingRegId={draggingRegId}
+                      setDraggingRegId={setDraggingRegId}
+                      dropHover={dropHover}
+                      setDropHover={setDropHover}
+                      registrationsById={registrations}
                     />
                   );
                 })}
@@ -340,59 +356,236 @@ export default function TeamsPage() {
         );
       })}
 
-      {/* Unassigned eligible children */}
-      <section className="bg-white rounded-lg shadow-sm border p-5 mb-6">
-        <h3 className="font-semibold text-gray-800 mb-3">
-          Подтверждённые дети без команды (
-          {registrations.filter(
-            (r) =>
-              r.camp === activeCamp &&
-              r.status === "Подтверждена" &&
-              !r.teamId
-          ).length}
-          )
-        </h3>
-        <p className="text-xs text-gray-500 mb-3">
-          В этот список попадают дети со статусом «Подтверждена», которым
-          ещё не назначена команда.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {registrations
-            .filter(
-              (r) =>
-                r.camp === activeCamp &&
-                r.status === "Подтверждена" &&
-                !r.teamId
-            )
-            .map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                onClick={() => setOpenRegId(r.id)}
-                className="px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium hover:bg-amber-100"
-                title="Открыть карточку"
-              >
-                {r.childName}
-                {r.childGender === "Мальчик"
-                  ? " 👦"
-                  : r.childGender === "Девочка"
-                  ? " 👧"
-                  : ""}
-                {r.childAge ? ` · ${r.childAge}` : ""}
-              </button>
-            ))}
-          {registrations.filter(
-            (r) =>
-              r.camp === activeCamp &&
-              r.status === "Подтверждена" &&
-              !r.teamId
-          ).length === 0 && (
-            <p className="text-sm text-gray-500">
-              Все подтверждённые дети распределены.
-            </p>
-          )}
-        </div>
-      </section>
+      {/* Unassigned confirmed children — table with filters + dropdown assign */}
+      {(() => {
+        const allUnassigned = registrations.filter(
+          (r) =>
+            r.camp === activeCamp &&
+            r.status === "Подтверждена" &&
+            !r.teamId
+        );
+
+        function inAgeBucket(age: number) {
+          if (filterAge === "all") return true;
+          if (filterAge === "7-8") return age >= 7 && age <= 8;
+          if (filterAge === "9-10") return age >= 9 && age <= 10;
+          if (filterAge === "11-12") return age >= 11 && age <= 12;
+          if (filterAge === "13-14") return age >= 13 && age <= 14;
+          if (filterAge === "15+") return age >= 15;
+          return true;
+        }
+
+        const filtered = allUnassigned.filter((r) => {
+          if (filterGender !== "all") {
+            const code = REG_GENDER_TO_CODE[r.childGender || ""];
+            if (code !== filterGender) return false;
+          }
+          if (!inAgeBucket(r.childAge)) return false;
+          return true;
+        });
+
+        const isDropHover = dropHover === "unassigned";
+
+        return (
+          <section
+            className={`bg-white rounded-lg shadow-sm border p-5 mb-6 transition-all ${
+              isDropHover
+                ? "border-amber-400 ring-2 ring-amber-200"
+                : "border-gray-200"
+            }`}
+            onDragOver={(e) => {
+              if (!draggingRegId) return;
+              e.preventDefault();
+              setDropHover("unassigned");
+            }}
+            onDragLeave={() => setDropHover(null)}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (!draggingRegId) return;
+              assignChild(draggingRegId, null);
+              setDraggingRegId(null);
+              setDropHover(null);
+            }}
+          >
+            <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
+              <h3 className="font-semibold text-gray-800">
+                Подтверждённые дети без команды ({allUnassigned.length})
+              </h3>
+              <span className="text-xs text-gray-500">
+                Показано: {filtered.length}
+              </span>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-gray-500 mr-1">Пол:</span>
+                {(
+                  [
+                    ["all", "Все"],
+                    ["boy", "👦 Мальчики"],
+                    ["girl", "👧 Девочки"],
+                  ] as ["all" | Gender, string][]
+                ).map(([k, label]) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setFilterGender(k)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                      filterGender === k
+                        ? "bg-[#1a73e8] text-white border-[#1a73e8]"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-gray-500 mr-1">Возраст:</span>
+                {(
+                  ["all", "7-8", "9-10", "11-12", "13-14", "15+"] as const
+                ).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setFilterAge(k)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                      filterAge === k
+                        ? "bg-[#1a73e8] text-white border-[#1a73e8]"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {k === "all" ? "Все" : `${k} лет`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Table */}
+            {filtered.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-6">
+                {allUnassigned.length === 0
+                  ? "Все подтверждённые дети распределены."
+                  : "Нет детей, подходящих под выбранные фильтры."}
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">
+                        Имя
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">
+                        Пол
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">
+                        Возраст
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">
+                        Город
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wide">
+                        Назначить в команду
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filtered.map((r) => {
+                      const code = REG_GENDER_TO_CODE[r.childGender || ""];
+                      const eligibleTeams = teamsForCamp
+                        .filter((t) => !code || t.gender === code)
+                        .sort((a, b) => {
+                          if (a.gender !== b.gender)
+                            return a.gender === "boy" ? -1 : 1;
+                          return a.number - b.number;
+                        });
+                      const isDragging = draggingRegId === r.id;
+                      return (
+                        <tr
+                          key={r.id}
+                          draggable
+                          onDragStart={(e) => {
+                            setDraggingRegId(r.id);
+                            e.dataTransfer.effectAllowed = "move";
+                            e.dataTransfer.setData("text/plain", r.id);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingRegId(null);
+                            setDropHover(null);
+                          }}
+                          className={`hover:bg-amber-50 transition-colors cursor-grab active:cursor-grabbing ${
+                            isDragging ? "opacity-40" : ""
+                          }`}
+                          title="Можно перетащить в команду"
+                        >
+                          <td className="px-3 py-2">
+                            <button
+                              type="button"
+                              onClick={() => setOpenRegId(r.id)}
+                              className="text-[#1a73e8] hover:underline font-medium text-left"
+                            >
+                              {r.childName}
+                            </button>
+                          </td>
+                          <td className="px-3 py-2 text-gray-700 whitespace-nowrap">
+                            {r.childGender === "Мальчик" ? (
+                              <span className="inline-flex items-center gap-1">
+                                👦 Мальчик
+                              </span>
+                            ) : r.childGender === "Девочка" ? (
+                              <span className="inline-flex items-center gap-1">
+                                👧 Девочка
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-gray-700 tabular-nums">
+                            {r.childAge || "—"}
+                          </td>
+                          <td className="px-3 py-2 text-gray-700">{r.city}</td>
+                          <td className="px-3 py-2">
+                            <select
+                              value=""
+                              onChange={(e) => {
+                                const tid = e.target.value;
+                                if (tid) assignChild(r.id, tid);
+                              }}
+                              className="border border-gray-300 rounded-md px-2 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[#1a73e8] min-w-[200px]"
+                              disabled={eligibleTeams.length === 0}
+                            >
+                              <option value="">
+                                {eligibleTeams.length === 0
+                                  ? "Нет подходящих команд"
+                                  : "— Выбрать команду —"}
+                              </option>
+                              {eligibleTeams.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                  {GENDER_LABEL[t.gender]} · №{t.number}
+                                  {t.name ? ` «${t.name}»` : ""}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {draggingRegId && (
+              <p className="text-xs text-amber-700 mt-3 italic">
+                💡 Перетащите ребёнка на нужную команду или сюда, чтобы убрать
+                из команды.
+              </p>
+            )}
+          </section>
+        );
+      })()}
 
       <RegistrationModal
         registrationId={openRegId}
@@ -415,6 +608,11 @@ function TeamCard({
   onAssign,
   onOpenRegistration,
   canDelete,
+  draggingRegId,
+  setDraggingRegId,
+  dropHover,
+  setDropHover,
+  registrationsById,
 }: {
   team: Team;
   mentors: Mentor[];
@@ -426,13 +624,58 @@ function TeamCard({
   onAssign: (regId: string, teamId: string | null) => void;
   onOpenRegistration: (id: string) => void;
   canDelete: boolean;
+  draggingRegId: string | null;
+  setDraggingRegId: (id: string | null) => void;
+  dropHover: string | null;
+  setDropHover: (id: string | null) => void;
+  registrationsById: Registration[];
 }) {
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(team.name);
   const [showAdd, setShowAdd] = useState(false);
 
+  const isDropHover = dropHover === team.id;
+  // Only highlight if the dragged child has matching gender (or unknown).
+  const dragged =
+    draggingRegId
+      ? registrationsById.find((r) => r.id === draggingRegId)
+      : null;
+  const draggedCode = dragged
+    ? REG_GENDER_TO_CODE[dragged.childGender || ""]
+    : null;
+  const compatible = !draggedCode || draggedCode === team.gender;
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+    <div
+      className={`bg-white rounded-lg border shadow-sm p-4 transition-all ${
+        isDropHover && compatible
+          ? "border-blue-400 ring-2 ring-blue-200 -translate-y-0.5"
+          : isDropHover && !compatible
+          ? "border-red-300 ring-2 ring-red-100"
+          : "border-gray-200"
+      }`}
+      onDragOver={(e) => {
+        if (!draggingRegId) return;
+        e.preventDefault();
+        setDropHover(team.id);
+      }}
+      onDragLeave={(e) => {
+        // Only clear if leaving the element (not entering a child)
+        if (e.currentTarget === e.target) setDropHover(null);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        if (!draggingRegId) return;
+        if (!compatible) {
+          setDraggingRegId(null);
+          setDropHover(null);
+          return;
+        }
+        onAssign(draggingRegId, team.id);
+        setDraggingRegId(null);
+        setDropHover(null);
+      }}
+    >
       {/* Header row */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0 flex-1">
@@ -515,34 +758,66 @@ function TeamCard({
         </div>
 
         {members.length === 0 ? (
-          <p className="text-xs text-gray-400 italic">Пусто.</p>
+          <p
+            className={`text-xs italic ${
+              isDropHover && compatible
+                ? "text-blue-600 font-medium"
+                : "text-gray-400"
+            }`}
+          >
+            {isDropHover && compatible
+              ? "Отпустите, чтобы добавить сюда"
+              : "Пусто."}
+          </p>
         ) : (
           <ul className="flex flex-col gap-1">
-            {members.map((m) => (
-              <li
-                key={m.id}
-                className="flex items-center justify-between gap-2 text-sm bg-gray-50 rounded px-2.5 py-1.5"
-              >
-                <button
-                  type="button"
-                  onClick={() => onOpenRegistration(m.id)}
-                  className="text-[#1a73e8] hover:underline truncate text-left"
+            {members.map((m) => {
+              const isDragging = draggingRegId === m.id;
+              return (
+                <li
+                  key={m.id}
+                  draggable
+                  onDragStart={(e) => {
+                    setDraggingRegId(m.id);
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", m.id);
+                  }}
+                  onDragEnd={() => {
+                    setDraggingRegId(null);
+                    setDropHover(null);
+                  }}
+                  className={`flex items-center justify-between gap-2 text-sm bg-gray-50 rounded px-2.5 py-1.5 cursor-grab active:cursor-grabbing transition-opacity ${
+                    isDragging ? "opacity-40" : "hover:bg-gray-100"
+                  }`}
+                  title="Перетащите в другую команду"
                 >
-                  {m.childName}
-                </button>
-                <span className="text-xs text-gray-500 whitespace-nowrap">
-                  {m.childAge ? `${m.childAge} л.` : ""}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => onAssign(m.id, null)}
-                  title="Убрать из команды"
-                  className="text-xs text-red-600 hover:text-red-700"
-                >
-                  ✕
-                </button>
-              </li>
-            ))}
+                  <span className="text-gray-400 select-none">⋮⋮</span>
+                  <button
+                    type="button"
+                    onClick={() => onOpenRegistration(m.id)}
+                    className="text-[#1a73e8] hover:underline truncate text-left flex-1"
+                  >
+                    {m.childName}
+                  </button>
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {m.childGender === "Мальчик"
+                      ? "👦"
+                      : m.childGender === "Девочка"
+                      ? "👧"
+                      : ""}
+                    {m.childAge ? ` ${m.childAge} л.` : ""}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onAssign(m.id, null)}
+                    title="Убрать из команды"
+                    className="text-xs text-red-600 hover:text-red-700"
+                  >
+                    ✕
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
 
