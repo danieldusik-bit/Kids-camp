@@ -13,6 +13,7 @@ interface Stats {
 
 interface Registration {
   id: string;
+  camp?: string;
   childName: string;
   parentName: string;
   parentPhone: string;
@@ -32,6 +33,22 @@ function StatusBadge({ status }: { status: string }) {
       {status}
     </span>
   );
+}
+
+function CampBadge({ camp }: { camp?: string }) {
+  if (camp === "teens")
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-orange-100 text-orange-800 whitespace-nowrap">
+        🔥 Подростковый
+      </span>
+    );
+  if (camp === "kids")
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-emerald-100 text-emerald-800 whitespace-nowrap">
+        🏕️ Детский
+      </span>
+    );
+  return <span className="text-xs text-gray-400">—</span>;
 }
 
 export default function DashboardPage() {
@@ -72,6 +89,7 @@ export default function DashboardPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-gray-600 font-medium">Имя ребёнка</th>
+                <th className="px-4 py-3 text-left text-gray-600 font-medium">Смена</th>
                 <th className="px-4 py-3 text-left text-gray-600 font-medium">Родитель</th>
                 <th className="px-4 py-3 text-left text-gray-600 font-medium">Телефон</th>
                 <th className="px-4 py-3 text-left text-gray-600 font-medium">Город</th>
@@ -91,6 +109,7 @@ export default function DashboardPage() {
                       {r.childName}
                     </button>
                   </td>
+                  <td className="px-4 py-3"><CampBadge camp={r.camp} /></td>
                   <td className="px-4 py-3">{r.parentName}</td>
                   <td className="px-4 py-3">{r.parentPhone}</td>
                   <td className="px-4 py-3">{r.city}</td>
@@ -100,7 +119,7 @@ export default function DashboardPage() {
               ))}
               {recent.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                     Заявок пока нет
                   </td>
                 </tr>
