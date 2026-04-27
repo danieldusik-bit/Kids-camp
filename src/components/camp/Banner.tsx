@@ -8,7 +8,7 @@ export function Banner() {
         <img
           src="/banner.jpeg?v=2"
           alt="Летние лагеря ц. Храм Спасения 2026"
-          className="block w-full h-auto rounded-3xl border border-line shadow-[0_4px_24px_rgba(60,40,20,0.05)]"
+          className="block w-full h-auto rounded-3xl border border-line shadow-[0_4px_24px_rgba(31,60,110,0.06)]"
         />
       </div>
     </header>

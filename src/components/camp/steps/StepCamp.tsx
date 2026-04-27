@@ -23,7 +23,7 @@ export function StepCamp({
               className={[
                 "text-left rounded-2xl border-[1.5px] p-5 transition-all flex flex-col gap-3",
                 on
-                  ? "bg-accent-soft/40 border-accent shadow-[0_4px_16px_rgba(179,107,61,0.18)]"
+                  ? "bg-accent-soft/40 border-accent shadow-[0_4px_16px_rgba(36,95,167,0.18)]"
                   : "bg-surface-soft border-line hover:border-line-strong hover:bg-surface",
               ].join(" ")}
             >

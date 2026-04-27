@@ -29,7 +29,7 @@ export function Chips({ label, required, value, onChange, options }: Props) {
               className={[
                 "h-10 px-4 rounded-full text-[14px] font-medium border transition-all",
                 on
-                  ? "bg-accent border-accent text-white shadow-[0_2px_8px_rgba(179,107,61,0.25)]"
+                  ? "bg-accent border-accent text-white shadow-[0_2px_8px_rgba(36,95,167,0.25)]"
                   : "bg-surface-soft border-line text-ink-soft hover:border-accent hover:text-accent-strong",
               ].join(" ")}
             >

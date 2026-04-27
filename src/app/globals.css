@@ -4,21 +4,21 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@400;500;600;700&display=swap');
 
-/* Warm palette — RGB triplets for Tailwind alpha support. */
+/* Sky-blue palette — matches the banner. RGB triplets for Tailwind alpha support. */
 :root {
-  --bg: 247 241 231;
+  --bg: 234 242 251;            /* light sky #eaf2fb */
   --surface: 255 255 255;
-  --surface-soft: 253 248 238;
-  --ink: 44 42 38;
-  --ink-soft: 91 87 77;
-  --ink-mute: 139 134 122;
-  --line: 235 226 208;
-  --line-strong: 214 201 175;
-  --accent: 210 139 91;
-  --accent-strong: 179 107 61;
-  --accent-soft: 246 222 197;
-  --tint: 255 244 227;
-  --err: 179 74 58;
+  --surface-soft: 243 248 253;  /* very light blue #f3f8fd */
+  --ink: 31 43 74;              /* deep navy #1f2b4a */
+  --ink-soft: 74 86 119;        /* #4a5677 */
+  --ink-mute: 130 144 173;      /* #8290ad */
+  --line: 212 223 238;          /* #d4dfee */
+  --line-strong: 177 193 216;   /* #b1c1d8 */
+  --accent: 74 137 213;         /* sky blue #4a89d5 (matches banner numerals) */
+  --accent-strong: 36 95 167;   /* deeper sky #245fa7 */
+  --accent-soft: 213 228 247;   /* halo / chip fill #d5e4f7 */
+  --tint: 232 240 251;          /* meta strip #e8f0fb */
+  --err: 192 82 74;             /* warm red kept for errors */
 }
 
 html, body { height: 100%; }

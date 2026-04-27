@@ -80,10 +80,10 @@ export default function RegisterPage() {
             </div>
           </div>
           <a
-            href="tel:+37127627010"
+            href="tel:+37127626010"
             className="text-sm text-ink-soft hover:text-accent-strong transition-colors hidden sm:inline"
           >
-            Помощь · Эсфирь 27627010
+            Помощь · Эсфирь 27626010
           </a>
         </div>
 
@@ -119,7 +119,7 @@ export default function RegisterPage() {
           {/* Form card */}
           <section
             id="wizard-form"
-            className="bg-surface rounded-3xl border border-line shadow-[0_4px_24px_rgba(60,40,20,0.05)] p-6 sm:p-9 lg:p-10 scroll-mt-4"
+            className="bg-surface rounded-3xl border border-line shadow-[0_4px_24px_rgba(31,60,110,0.06)] p-6 sm:p-9 lg:p-10 scroll-mt-4"
           >
             {submitted ? (
               <Success

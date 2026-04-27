@@ -30,7 +30,7 @@ export function Success({ data, onReset, onAddAnother }: Props) {
       `E-mail: ${data.parentEmail}`,
       "",
       "Спасибо! Мы получили заявку.",
-      "Координатор лагеря: Эсфирь · 27627010",
+      "Координатор лагеря: Эсфирь · 27626010",
     ].filter(Boolean);
     const body = encodeURIComponent(lines.join("\n"));
     const to = encodeURIComponent(data.parentEmail || "");
@@ -71,7 +71,7 @@ export function Success({ data, onReset, onAddAnother }: Props) {
           {data.parentEmail || "указанный e-mail"}
         </strong>
         . Если возникнут вопросы — звоните координатору лагеря{" "}
-        <strong className="text-ink">Эсфирь · 27627010</strong>.
+        <strong className="text-ink">Эсфирь · 27626010</strong>.
       </p>
 
       {/* Send copy / call */}
@@ -109,7 +109,7 @@ export function Success({ data, onReset, onAddAnother }: Props) {
           </a>
         )}
         <a
-          href="tel:+37127627010"
+          href="tel:+37127626010"
           className="h-[42px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[14px] bg-surface-soft hover:bg-tint text-ink-soft border border-line transition-all"
         >
           📞 Позвонить координатору
@@ -121,7 +121,7 @@ export function Success({ data, onReset, onAddAnother }: Props) {
         <button
           type="button"
           onClick={onAddAnother}
-          className="h-[46px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] bg-accent hover:bg-accent-strong text-white shadow-[0_4px_12px_rgba(179,107,61,0.25)] hover:-translate-y-px transition-all"
+          className="h-[46px] px-5 inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] bg-accent hover:bg-accent-strong text-white shadow-[0_4px_12px_rgba(36,95,167,0.25)] hover:-translate-y-px transition-all"
         >
           <svg
             width="16"

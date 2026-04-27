@@ -10,7 +10,7 @@ type Props = {
 export function SideNav({ current, onJump, campId }: Props) {
   const selected = CAMPS.find((c) => c.id === campId);
   return (
-    <aside className="lg:sticky lg:top-6 bg-surface rounded-3xl p-[18px] border border-line shadow-[0_4px_16px_rgba(60,40,20,0.04)]">
+    <aside className="lg:sticky lg:top-6 bg-surface rounded-3xl p-[18px] border border-line shadow-[0_4px_16px_rgba(31,60,110,0.05)]">
       <div className="text-[11px] uppercase tracking-[0.12em] text-ink-mute font-bold px-2.5 pb-3">
         Шаги
       </div>

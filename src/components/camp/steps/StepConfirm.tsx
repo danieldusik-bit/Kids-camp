@@ -233,7 +233,7 @@ export function StepConfirm({
             {data.parentEmail || "указанный e-mail"}
           </strong>
           . Если возникнут вопросы — звоните координатору лагеря{" "}
-          <strong className="text-ink">Эсфирь · 27627010</strong>.
+          <strong className="text-ink">Эсфирь · 27626010</strong>.
         </div>
       </div>
 

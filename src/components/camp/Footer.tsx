@@ -44,7 +44,7 @@ export function Footer({
         type="button"
         onClick={isLast ? onSubmit : onNext}
         disabled={submitting}
-        className="h-[46px] px-[22px] rounded-full font-semibold text-[15px] bg-accent hover:bg-accent-strong text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_4px_12px_rgba(179,107,61,0.3)] hover:-translate-y-px hover:shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_6px_16px_rgba(179,107,61,0.35)] transition-all justify-self-end disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        className="h-[46px] px-[22px] rounded-full font-semibold text-[15px] bg-accent hover:bg-accent-strong text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_4px_12px_rgba(36,95,167,0.3)] hover:-translate-y-px hover:shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_6px_16px_rgba(36,95,167,0.35)] transition-all justify-self-end disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
       >
         {isLast
           ? submitting
