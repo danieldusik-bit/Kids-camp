@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import Link from "next/link";
+import RegistrationModal from "@/components/RegistrationModal";
 
 interface Stats {
   total: number;
@@ -37,11 +37,18 @@ function StatusBadge({ status }: { status: string }) {
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [recent, setRecent] = useState<Registration[]>([]);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const refresh = useCallback(() => {
+    fetch("/api/admin/stats").then((r) => r.json()).then(setStats);
+    fetch("/api/admin/registrations?limit=10")
+      .then((r) => r.json())
+      .then((d) => setRecent(d.registrations || []));
+  }, []);
 
   useEffect(() => {
-    fetch("/api/admin/stats").then((r) => r.json()).then(setStats);
-    fetch("/api/admin/registrations?limit=10").then((r) => r.json()).then((d) => setRecent(d.registrations || []));
-  }, []);
+    refresh();
+  }, [refresh]);
 
   return (
     <AdminLayout>
@@ -76,9 +83,13 @@ export default function DashboardPage() {
               {recent.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/registrations/${r.id}`} className="text-[#1a73e8] hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => setOpenId(r.id)}
+                      className="text-[#1a73e8] hover:underline text-left"
+                    >
                       {r.childName}
-                    </Link>
+                    </button>
                   </td>
                   <td className="px-4 py-3">{r.parentName}</td>
                   <td className="px-4 py-3">{r.parentPhone}</td>
@@ -98,6 +109,13 @@ export default function DashboardPage() {
           </table>
         </div>
       </div>
+
+      <RegistrationModal
+        registrationId={openId}
+        onClose={() => setOpenId(null)}
+        onChanged={refresh}
+        onDeleted={refresh}
+      />
     </AdminLayout>
   );
 }
