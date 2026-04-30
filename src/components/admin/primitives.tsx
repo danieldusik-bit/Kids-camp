@@ -208,10 +208,12 @@ export function GenderDonut({
 }) {
   const m = apps.filter((a) => a.childGender === "Мальчик").length;
   const f = apps.filter((a) => a.childGender === "Девочка").length;
-  const total = m + f;
+  const total = apps.length;
+  const unknown = total - m - f;
   const denom = total || 1;
   const mPct = m / denom;
   const fPct = f / denom;
+  const uPct = unknown / denom;
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
@@ -253,6 +255,19 @@ export function GenderDonut({
               strokeDashoffset={-C * mPct}
               transform="rotate(-90 85 85)"
             />
+            {unknown > 0 && (
+              <circle
+                cx="85"
+                cy="85"
+                r="56"
+                fill="none"
+                stroke="#bdb5a4"
+                strokeWidth="22"
+                strokeDasharray={`${C * uPct} ${C}`}
+                strokeDashoffset={-C * (mPct + fPct)}
+                transform="rotate(-90 85 85)"
+              />
+            )}
           </>
         )}
         <text
@@ -292,6 +307,14 @@ export function GenderDonut({
           n={f}
           pct={Math.round(fPct * 100)}
         />
+        {unknown > 0 && (
+          <DonutLegend
+            dot="#bdb5a4"
+            label="Не указано"
+            n={unknown}
+            pct={Math.round(uPct * 100)}
+          />
+        )}
       </div>
     </div>
   );
@@ -310,7 +333,9 @@ export function AgeDonut({ apps }: { apps: { childAge: number }[] }) {
       (a) => a.childAge >= b.range[0] && a.childAge <= b.range[1]
     ).length,
   }));
-  const total = buckets.reduce((s, b) => s + b.count, 0);
+  const total = apps.length;
+  const inBuckets = buckets.reduce((s, b) => s + b.count, 0);
+  const unknown = total - inBuckets;
   const denom = total || 1;
   let acc = 0;
 
@@ -351,6 +376,24 @@ export function AgeDonut({ apps }: { apps: { childAge: number }[] }) {
             />
           );
         })}
+        {unknown > 0 && (() => {
+          const pct = unknown / denom;
+          const dash = C * pct;
+          const offset = -C * acc;
+          return (
+            <circle
+              cx="85"
+              cy="85"
+              r="56"
+              fill="none"
+              stroke="#bdb5a4"
+              strokeWidth="22"
+              strokeDasharray={`${dash} ${C}`}
+              strokeDashoffset={offset}
+              transform="rotate(-90 85 85)"
+            />
+          );
+        })()}
         <text
           x="85"
           y="80"
@@ -370,7 +413,7 @@ export function AgeDonut({ apps }: { apps: { childAge: number }[] }) {
             textTransform: "uppercase",
           }}
         >
-          детей
+          заявок
         </text>
       </svg>
       <div
@@ -385,6 +428,14 @@ export function AgeDonut({ apps }: { apps: { childAge: number }[] }) {
             pct={Math.round((b.count / denom) * 100)}
           />
         ))}
+        {unknown > 0 && (
+          <DonutLegend
+            dot="#bdb5a4"
+            label="Не указано"
+            n={unknown}
+            pct={Math.round((unknown / denom) * 100)}
+          />
+        )}
       </div>
     </div>
   );
