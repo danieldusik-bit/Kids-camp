@@ -40,6 +40,7 @@ export default function CampPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [chartScope, setChartScope] = useState<"all" | "confirmed">("all");
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -70,6 +71,16 @@ export default function CampPage() {
     };
   }, [registrations]);
 
+  const chartApps = useMemo(() => {
+    if (chartScope === "confirmed") {
+      return registrations.filter((r) => r.status === "Подтверждена");
+    }
+    return registrations;
+  }, [registrations, chartScope]);
+
+  const chartLabel =
+    chartScope === "confirmed" ? "только подтверждённые" : "все заявки";
+
   return (
     <AdminLayout
       hero={
@@ -95,20 +106,58 @@ export default function CampPage() {
         <Kpi label="Отклонённые" value={stats.r} tone="red" icon="!" />
       </KpiRow>
 
+      <div
+        role="tablist"
+        aria-label="Источник для графиков"
+        style={{
+          display: "inline-flex",
+          gap: 8,
+          padding: 4,
+          background: "#f6efe0",
+          borderRadius: 999,
+          marginBottom: 12,
+        }}
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={chartScope === "all"}
+          className={`vd-btn ${
+            chartScope === "all" ? "vd-btn-primary" : "vd-btn-ghost"
+          }`}
+          style={{ borderRadius: 999, padding: "6px 14px" }}
+          onClick={() => setChartScope("all")}
+        >
+          Все заявки ({stats.total})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={chartScope === "confirmed"}
+          className={`vd-btn ${
+            chartScope === "confirmed" ? "vd-btn-primary" : "vd-btn-ghost"
+          }`}
+          style={{ borderRadius: 999, padding: "6px 14px" }}
+          onClick={() => setChartScope("confirmed")}
+        >
+          Подтверждённые ({stats.c})
+        </button>
+      </div>
+
       <div className="vd-charts">
         <section className="vd-card">
           <div className="vd-block-head">
             <h2>По полу</h2>
-            <span className="vd-mute">{meta.label.toLowerCase()}</span>
+            <span className="vd-mute">{chartLabel}</span>
           </div>
-          <GenderDonut apps={registrations} />
+          <GenderDonut apps={chartApps} />
         </section>
         <section className="vd-card">
           <div className="vd-block-head">
             <h2>По возрасту</h2>
-            <span className="vd-mute">{meta.label.toLowerCase()}</span>
+            <span className="vd-mute">{chartLabel}</span>
           </div>
-          <AgeDonut apps={registrations} />
+          <AgeDonut apps={chartApps} />
         </section>
       </div>
 
