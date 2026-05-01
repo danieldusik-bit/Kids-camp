@@ -87,6 +87,10 @@ function toApiPayload(data: FormData) {
     childPersonalId: data.childPersonalCode,
     childLanguage: LANGUAGE_LABEL[data.childLanguage] || data.childLanguage,
     city: data.childCity,
+    declaredAddress: data.declaredAddress,
+    actualAddress: data.actualSameAsDeclared
+      ? data.declaredAddress
+      : data.actualAddress,
     // Structured pickup contacts (new form)
     pickup1Name: data.pickup1Name,
     pickup1Phone: data.pickup1Phone,
@@ -164,9 +168,20 @@ export function useCampForm() {
       if (k === "childPersonalCode") return isPersonalCode(v);
       if (k === "encephalitisVaccine" || k === "participatedOtherCamps")
         return isYesNo(v);
+      if (k === "declaredAddress") return isFilled(v);
       return isFilled(v);
     });
   }, [data, stepId]);
+
+  // The actual address is conditionally required: only when the
+  // "same as declared" toggle is off, the actualAddress must be filled.
+  const stepValidWithCond = useMemo(() => {
+    if (!stepValid) return false;
+    if (stepId === "child" && !data.actualSameAsDeclared) {
+      return isFilled(data.actualAddress);
+    }
+    return true;
+  }, [stepValid, stepId, data.actualSameAsDeclared, data.actualAddress]);
 
   const goNext = useCallback(() => {
     setTouched((t) => {
@@ -174,13 +189,20 @@ export function useCampForm() {
       STEP_REQUIRED[STEPS[stepIdx].id].forEach((k) => {
         next[k] = true;
       });
+      // Conditionally require actualAddress when the toggle is off.
+      if (
+        STEPS[stepIdx].id === "child" &&
+        !data.actualSameAsDeclared
+      ) {
+        next.actualAddress = true;
+      }
       return next;
     });
-    if (stepValid) {
+    if (stepValidWithCond) {
       setStepIdx((i) => Math.min(i + 1, STEPS.length - 1));
       scrollToFormTop();
     }
-  }, [stepIdx, stepValid]);
+  }, [stepIdx, stepValidWithCond, data.actualSameAsDeclared]);
   const goPrev = useCallback(() => {
     setStepIdx((i) => Math.max(i - 1, 0));
     scrollToFormTop();
@@ -273,7 +295,7 @@ export function useCampForm() {
     selectedCamp,
     stepIdx,
     stepId,
-    stepValid,
+    stepValid: stepValidWithCond,
     goNext,
     goPrev,
     goTo,

@@ -57,6 +57,9 @@ export type FormData = {
   childBirth: string;
   childPersonalCode: string;
   childCity: string;
+  declaredAddress: string;
+  actualAddress: string;
+  actualSameAsDeclared: boolean;
   childLanguage: string;
   groupWith: string;
   pickup1Name: string;
@@ -99,6 +102,9 @@ export const INITIAL_DATA: FormData = {
   childBirth: "",
   childPersonalCode: "",
   childCity: "",
+  declaredAddress: "",
+  actualAddress: "",
+  actualSameAsDeclared: true,
   childLanguage: "Русский",
   groupWith: "",
   pickup1Name: "",

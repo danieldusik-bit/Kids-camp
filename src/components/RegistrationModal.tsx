@@ -19,6 +19,8 @@ interface Registration {
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   city: string;
+  declaredAddress?: string;
+  actualAddress?: string;
   billingName?: string;
   billingId?: string;
   billingAddress?: string;
@@ -219,6 +221,20 @@ export default function RegistrationModal({
                   value={reg.childLanguage || "—"}
                 />
                 <Field label="Город" value={reg.city} />
+                <Field
+                  label="Декларированный адрес"
+                  value={reg.declaredAddress || "—"}
+                />
+                <Field
+                  label="Фактический адрес"
+                  value={
+                    reg.actualAddress
+                      ? reg.actualAddress === reg.declaredAddress
+                        ? "= декларированный"
+                        : reg.actualAddress
+                      : "—"
+                  }
+                />
               </div>
 
               <SubHeading>Родитель / Опекун</SubHeading>

@@ -1,6 +1,7 @@
 "use client";
 import { Field } from "../fields/Field";
 import { Chips } from "../fields/Chips";
+import { Area } from "../fields/Area";
 import type { useCampForm } from "@/lib/camp/useCampForm";
 import { CAMPS } from "@/lib/camp/camp";
 
@@ -97,6 +98,47 @@ export function StepChild({
         placeholder="Рига"
       />
 
+      <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col gap-4">
+        <h3 className="font-display text-[19px] font-semibold mt-0 mb-0 text-ink">
+          Адрес проживания
+        </h3>
+        <Area
+          id="declaredAddress"
+          label="Декларированный адрес"
+          required
+          rows={2}
+          value={data.declaredAddress}
+          onChange={(v) => set("declaredAddress", v)}
+          onBlur={() => touch("declaredAddress")}
+          error={errors.declaredAddress}
+          placeholder="Brīvības iela 1-15, Rīga, LV-1010"
+        />
+        <label className="flex items-center gap-3 text-[14px] text-ink-soft">
+          <input
+            type="checkbox"
+            checked={data.actualSameAsDeclared}
+            onChange={(e) => set("actualSameAsDeclared", e.target.checked)}
+            className="w-[18px] h-[18px] accent-[rgb(var(--accent))]"
+          />
+          Фактический адрес совпадает с декларированным
+        </label>
+        {!data.actualSameAsDeclared && (
+          <div className="animate-slideIn">
+            <Area
+              id="actualAddress"
+              label="Фактический адрес"
+              required
+              rows={2}
+              value={data.actualAddress}
+              onChange={(v) => set("actualAddress", v)}
+              onBlur={() => touch("actualAddress")}
+              error={errors.actualAddress}
+              placeholder="Где ребёнок живёт фактически"
+            />
+          </div>
+        )}
+      </div>
+
       <Chips
         label="Язык общения"
         required
@@ -125,7 +167,8 @@ export function StepChild({
           </h3>
           <p className="text-[13px] text-ink-mute mt-0 mb-0">
             Минимум два контакта — оба обязательны. Это могут быть родители,
-            бабушка, дедушка, тётя — кто угодно из семьи.
+            бабушка, дедушка, тётя — кто угодно из семьи. Кроме того, кто
+            заполняет договор.
           </p>
         </div>
 

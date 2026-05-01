@@ -99,6 +99,16 @@ export function StepConfirm({
               : []),
             { label: "Город", value: data.childCity || "—" },
             {
+              label: "Декларированный адрес",
+              value: data.declaredAddress || "—",
+            },
+            {
+              label: "Фактический адрес",
+              value: data.actualSameAsDeclared
+                ? "Совпадает с декларированным"
+                : data.actualAddress || "—",
+            },
+            {
               label: "Язык общения",
               value:
                 LANG_LABEL[data.childLanguage] || data.childLanguage || "—",

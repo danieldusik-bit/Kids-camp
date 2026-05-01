@@ -36,6 +36,10 @@ model Registration {
   // Location
   city String
 
+  // Address (declared / actual)
+  declaredAddress String @default("")
+  actualAddress   String @default("")
+
   // Billing details
   billingName    String @default("")
   billingId      String @default("")

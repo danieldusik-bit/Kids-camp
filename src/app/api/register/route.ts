@@ -54,6 +54,8 @@ export async function POST(request: Request) {
 
         // Location
         city: body.city,
+        declaredAddress: body.declaredAddress || "",
+        actualAddress: body.actualAddress || "",
 
         // Billing (now optional / unused but kept for backward compatibility)
         billingName: body.billingName || "",

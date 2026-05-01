@@ -37,6 +37,18 @@ export function validate(
     "Формат: 6 цифр - 5 цифр (например 010203-12345)"
   );
   need("childCity", isFilled(data.childCity), "Укажите город");
+  need(
+    "declaredAddress",
+    isFilled(data.declaredAddress),
+    "Укажите декларированный адрес"
+  );
+  if (!data.actualSameAsDeclared) {
+    need(
+      "actualAddress",
+      isFilled(data.actualAddress),
+      "Укажите фактический адрес"
+    );
+  }
   // Pickup contact #1 required (2nd is optional but if started must be valid).
   need("pickup1Name", isFilled(data.pickup1Name), "Имя и фамилия контакта");
   need("pickup1Phone", isPhone(data.pickup1Phone), "Телефон контакта");
@@ -78,6 +90,7 @@ export const STEP_REQUIRED: Record<StepId, (keyof FormData)[]> = {
     "childBirth",
     "childPersonalCode",
     "childCity",
+    "declaredAddress",
     "pickup1Name",
     "pickup1Phone",
     "pickup1Relation",
