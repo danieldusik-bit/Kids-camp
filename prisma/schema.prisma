@@ -42,9 +42,17 @@ model Registration {
   billingAddress String @default("")
   billingEmail   String @default("")
 
-  // Pickup
+  // Pickup — legacy free-text fields, kept for backwards compatibility
   pickupAuthorized   String  @default("")
   childCanLeaveAlone Boolean @default(false)
+
+  // Pickup — structured contacts (new form)
+  pickup1Name     String @default("")
+  pickup1Phone    String @default("")
+  pickup1Relation String @default("")
+  pickup2Name     String @default("")
+  pickup2Phone    String @default("")
+  pickup2Relation String @default("")
 
   // Health
   hasAllergies        Boolean @default(false)
@@ -55,6 +63,12 @@ model Registration {
   medicationDetails   String  @default("")
   physicalActivity    String  @default("Разрешено")
   physicalLimitations String  @default("")
+
+  // Behavioural / extra health
+  hasSpecialTraits        Boolean @default(false)
+  specialTraitsDetails    String  @default("")
+  hasEncephalitisVaccine  String  @default("")
+  participatedOtherCamps  String  @default("")
 
   // Diet
   dietRestrictions String @default("нет")

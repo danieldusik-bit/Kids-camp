@@ -8,13 +8,17 @@ const yesNo = [
   { value: "no", label: "Нет" },
   { value: "yes", label: "Да" },
 ];
+const yesNoBlank = [
+  { value: "yes", label: "Да" },
+  { value: "no", label: "Нет" },
+];
 
 export function StepHealth({
   form,
 }: {
   form: ReturnType<typeof useCampForm>;
 }) {
-  const { data, set } = form;
+  const { data, set, errors, touch } = form;
   return (
     <div className="animate-fadeUp flex flex-col gap-5">
       <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
@@ -70,6 +74,62 @@ export function StepHealth({
               onChange={(v) => set("medsText", v)}
               placeholder="Препарат, дозировка, время приёма."
             />
+          </div>
+        )}
+      </div>
+
+      <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
+        <Chips
+          label="Особенности характера или психики"
+          value={data.hasSpecialTraits}
+          onChange={(v) => set("hasSpecialTraits", v as "yes" | "no")}
+          options={yesNo}
+        />
+        {data.hasSpecialTraits === "yes" && (
+          <div className="animate-slideIn">
+            <Area
+              id="specialTraitsText"
+              value={data.specialTraitsText}
+              onChange={(v) => set("specialTraitsText", v)}
+              placeholder="Особенности поведения, тревожности, СДВГ, аутизм, страхи, нюансы общения и т. д."
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
+        <Chips
+          label="Прививка от энцефалита"
+          required
+          value={data.encephalitisVaccine}
+          onChange={(v) =>
+            set("encephalitisVaccine", v as "" | "yes" | "no")
+          }
+          options={yesNoBlank}
+        />
+        {errors.encephalitisVaccine && (
+          <div
+            className="text-xs text-err"
+            onClick={() => touch("encephalitisVaccine")}
+          >
+            {errors.encephalitisVaccine}
+          </div>
+        )}
+      </div>
+
+      <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
+        <Chips
+          label="Участвовал ли ваш ребёнок в других лагерях?"
+          required
+          value={data.participatedOtherCamps}
+          onChange={(v) =>
+            set("participatedOtherCamps", v as "" | "yes" | "no")
+          }
+          options={yesNoBlank}
+        />
+        {errors.participatedOtherCamps && (
+          <div className="text-xs text-err">
+            {errors.participatedOtherCamps}
           </div>
         )}
       </div>

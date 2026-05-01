@@ -322,11 +322,11 @@ export function GenderDonut({
 
 export function AgeDonut({ apps }: { apps: { childAge: number }[] }) {
   const buckets = [
-    { label: "7–8 лет", range: [7, 8], color: "#d28b5b" },
+    { label: "6–8 лет", range: [6, 8], color: "#d28b5b" },
     { label: "9–10 лет", range: [9, 10], color: "#c89028" },
     { label: "11–12 лет", range: [11, 12], color: "#5d8aa8" },
     { label: "13–14 лет", range: [13, 14], color: "#3a8a55" },
-    { label: "15–17 лет", range: [15, 17], color: "#9b6d3f" },
+    { label: "15–18 лет", range: [15, 18], color: "#9b6d3f" },
   ].map((b) => ({
     ...b,
     count: apps.filter(

@@ -61,9 +61,17 @@ export async function POST(request: Request) {
         billingAddress: body.billingAddress || "",
         billingEmail: body.billingEmail || "",
 
-        // Pickup
+        // Pickup — legacy free-text (kept for backward compatibility)
         pickupAuthorized: body.pickupAuthorized || "",
         childCanLeaveAlone: !!body.childCanLeaveAlone,
+
+        // Pickup — structured contacts (new form)
+        pickup1Name: body.pickup1Name || "",
+        pickup1Phone: body.pickup1Phone || "",
+        pickup1Relation: body.pickup1Relation || "",
+        pickup2Name: body.pickup2Name || "",
+        pickup2Phone: body.pickup2Phone || "",
+        pickup2Relation: body.pickup2Relation || "",
 
         // Health
         hasAllergies: !!body.hasAllergies,
@@ -72,6 +80,10 @@ export async function POST(request: Request) {
         chronicDetails: body.chronicDetails || "",
         takesMedication: !!body.takesMedication,
         medicationDetails: body.medicationDetails || "",
+        hasSpecialTraits: !!body.hasSpecialTraits,
+        specialTraitsDetails: body.specialTraitsDetails || "",
+        hasEncephalitisVaccine: body.hasEncephalitisVaccine || "",
+        participatedOtherCamps: body.participatedOtherCamps || "",
         physicalActivity: body.physicalActivity || "Разрешено",
         physicalLimitations: body.physicalLimitations || "",
 

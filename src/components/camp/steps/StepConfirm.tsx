@@ -93,6 +93,7 @@ export function StepConfirm({
               ? [{ label: "Пол", value: GENDER_LABEL[data.childGender] }]
               : []),
             { label: "Дата рождения", value: data.childBirth || "—" },
+            { label: "Personas kods", value: data.childPersonalCode || "—" },
             ...(camp
               ? [{ label: `Возраст на ${formatStartShort(camp.startDate)}`, value: ageText }]
               : []),
@@ -105,12 +106,22 @@ export function StepConfirm({
             ...(data.groupWith
               ? [{ label: "В одной группе с", value: data.groupWith }]
               : []),
-            ...(data.pickupPersons
-              ? [{ label: "Кто забирает", value: data.pickupPersons }]
-              : []),
-            ...(data.selfDismissal
-              ? [{ label: "Может уходить сам", value: "Да" }]
-              : []),
+            {
+              label: "Кто забирает (1)",
+              value: pickupLine(
+                data.pickup1Name,
+                data.pickup1Phone,
+                data.pickup1Relation
+              ),
+            },
+            {
+              label: "Кто забирает (2)",
+              value: pickupLine(
+                data.pickup2Name,
+                data.pickup2Phone,
+                data.pickup2Relation
+              ),
+            },
           ]}
         />
 
@@ -138,6 +149,31 @@ export function StepConfirm({
                 data.hasMeds === "yes"
                   ? `Да${data.medsText ? " — " + data.medsText : ""}`
                   : "Нет",
+            },
+            {
+              label: "Особенности характера / психики",
+              value:
+                data.hasSpecialTraits === "yes"
+                  ? `Да${data.specialTraitsText ? " — " + data.specialTraitsText : ""}`
+                  : "Нет",
+            },
+            {
+              label: "Прививка от энцефалита",
+              value:
+                data.encephalitisVaccine === "yes"
+                  ? "Да"
+                  : data.encephalitisVaccine === "no"
+                  ? "Нет"
+                  : "—",
+            },
+            {
+              label: "Был в других лагерях",
+              value:
+                data.participatedOtherCamps === "yes"
+                  ? "Да"
+                  : data.participatedOtherCamps === "no"
+                  ? "Нет"
+                  : "—",
             },
             {
               label: "Физическая активность",
@@ -295,6 +331,15 @@ function SummarySection({
       </dl>
     </div>
   );
+}
+
+function pickupLine(name: string, phone: string, relation: string) {
+  const parts = [
+    name,
+    relation,
+    phone ? `+371 ${phone}` : "",
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : "—";
 }
 
 function formatStartShort(iso: string) {

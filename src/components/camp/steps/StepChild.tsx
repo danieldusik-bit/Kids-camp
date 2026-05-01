@@ -1,7 +1,6 @@
 "use client";
 import { Field } from "../fields/Field";
 import { Chips } from "../fields/Chips";
-import { Area } from "../fields/Area";
 import type { useCampForm } from "@/lib/camp/useCampForm";
 import { CAMPS } from "@/lib/camp/camp";
 
@@ -75,6 +74,19 @@ export function StepChild({
       </div>
 
       <Field
+        id="childPersonalCode"
+        label="Personas kods (личный код)"
+        required
+        value={data.childPersonalCode}
+        onChange={(v) => set("childPersonalCode", v)}
+        onBlur={() => touch("childPersonalCode")}
+        error={errors.childPersonalCode}
+        placeholder="010203-12345"
+        hint="Латвийский personas kods ребёнка — формат 6 цифр - 5 цифр."
+        inputMode="numeric"
+      />
+
+      <Field
         id="childCity"
         label="Город / посёлок"
         required
@@ -106,26 +118,123 @@ export function StepChild({
         hint="Если ребёнок едет с друзьями — постараемся объединить их в одну группу."
       />
 
-      <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col gap-4">
-        <h3 className="font-display text-[19px] font-semibold mt-0 mb-0 text-ink">
-          Кто может забирать ребёнка
-        </h3>
-        <Area
-          id="pickupPersons"
-          value={data.pickupPersons}
-          onChange={(v) => set("pickupPersons", v)}
-          placeholder="Имя, родство, телефон. По одному в строке."
+      <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col gap-5">
+        <div>
+          <h3 className="font-display text-[19px] font-semibold mt-0 mb-1 text-ink">
+            Кто может забирать ребёнка
+          </h3>
+          <p className="text-[13px] text-ink-mute mt-0 mb-0">
+            Минимум два контакта — оба обязательны. Это могут быть родители,
+            бабушка, дедушка, тётя — кто угодно из семьи.
+          </p>
+        </div>
+
+        <PickupContact
+          n={1}
+          name={data.pickup1Name}
+          phone={data.pickup1Phone}
+          relation={data.pickup1Relation}
+          onName={(v) => set("pickup1Name", v)}
+          onPhone={(v) => set("pickup1Phone", v)}
+          onRelation={(v) => set("pickup1Relation", v)}
+          onTouchName={() => touch("pickup1Name")}
+          onTouchPhone={() => touch("pickup1Phone")}
+          onTouchRelation={() => touch("pickup1Relation")}
+          errName={errors.pickup1Name}
+          errPhone={errors.pickup1Phone}
+          errRelation={errors.pickup1Relation}
         />
-        <label className="flex items-center gap-3 text-[14px] text-ink-soft">
-          <input
-            type="checkbox"
-            checked={data.selfDismissal}
-            onChange={(e) => set("selfDismissal", e.target.checked)}
-            className="w-[18px] h-[18px] accent-[rgb(var(--accent))]"
-          />
-          Ребёнок может уходить домой самостоятельно
-        </label>
+
+        <PickupContact
+          n={2}
+          name={data.pickup2Name}
+          phone={data.pickup2Phone}
+          relation={data.pickup2Relation}
+          onName={(v) => set("pickup2Name", v)}
+          onPhone={(v) => set("pickup2Phone", v)}
+          onRelation={(v) => set("pickup2Relation", v)}
+          onTouchName={() => touch("pickup2Name")}
+          onTouchPhone={() => touch("pickup2Phone")}
+          onTouchRelation={() => touch("pickup2Relation")}
+          errName={errors.pickup2Name}
+          errPhone={errors.pickup2Phone}
+          errRelation={errors.pickup2Relation}
+        />
       </div>
+    </div>
+  );
+}
+
+function PickupContact({
+  n,
+  name,
+  phone,
+  relation,
+  onName,
+  onPhone,
+  onRelation,
+  onTouchName,
+  onTouchPhone,
+  onTouchRelation,
+  errName,
+  errPhone,
+  errRelation,
+}: {
+  n: number;
+  name: string;
+  phone: string;
+  relation: string;
+  onName: (v: string) => void;
+  onPhone: (v: string) => void;
+  onRelation: (v: string) => void;
+  onTouchName: () => void;
+  onTouchPhone: () => void;
+  onTouchRelation: () => void;
+  errName?: string;
+  errPhone?: string;
+  errRelation?: string;
+}) {
+  return (
+    <div className="bg-white rounded-xl p-4 border border-line flex flex-col gap-3">
+      <div className="text-[13px] font-semibold text-ink-soft uppercase tracking-[0.04em]">
+        Контакт #{n}
+      </div>
+      <div className="grid sm:grid-cols-2 grid-cols-1 gap-3">
+        <Field
+          id={`pickup${n}Name`}
+          label="Имя и фамилия"
+          required
+          value={name}
+          onChange={onName}
+          onBlur={onTouchName}
+          error={errName}
+          placeholder="Aija Bērziņa"
+          autoComplete="name"
+        />
+        <Field
+          id={`pickup${n}Phone`}
+          label="Телефон"
+          required
+          type="tel"
+          value={phone}
+          onChange={onPhone}
+          onBlur={onTouchPhone}
+          error={errPhone}
+          placeholder="20 123 456"
+          inputMode="tel"
+          prefix="+371"
+        />
+      </div>
+      <Field
+        id={`pickup${n}Relation`}
+        label="Кем приходится семье"
+        required
+        value={relation}
+        onChange={onRelation}
+        onBlur={onTouchRelation}
+        error={errRelation}
+        placeholder="Мама, папа, бабушка, тётя…"
+      />
     </div>
   );
 }

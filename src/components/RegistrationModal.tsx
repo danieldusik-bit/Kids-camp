@@ -25,12 +25,22 @@ interface Registration {
   billingEmail?: string;
   pickupAuthorized?: string;
   childCanLeaveAlone?: boolean;
+  pickup1Name?: string;
+  pickup1Phone?: string;
+  pickup1Relation?: string;
+  pickup2Name?: string;
+  pickup2Phone?: string;
+  pickup2Relation?: string;
   hasAllergies?: boolean;
   allergiesDetails?: string;
   hasChronicIllness?: boolean;
   chronicDetails?: string;
   takesMedication?: boolean;
   medicationDetails?: string;
+  hasSpecialTraits?: boolean;
+  specialTraitsDetails?: string;
+  hasEncephalitisVaccine?: string;
+  participatedOtherCamps?: string;
   physicalActivity?: string;
   physicalLimitations?: string;
   dietRestrictions?: string;
@@ -201,6 +211,10 @@ export default function RegistrationModal({
                 <Field label="Дата рождения" value={reg.childDOB} />
                 <Field label="Возраст" value={String(reg.childAge)} />
                 <Field
+                  label="Personas kods"
+                  value={reg.childPersonalId || "—"}
+                />
+                <Field
                   label="Язык общения"
                   value={reg.childLanguage || "—"}
                 />
@@ -275,15 +289,31 @@ export default function RegistrationModal({
               )}
 
               <SubHeading>Забор из лагеря</SubHeading>
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field
-                  label="Разрешено забирать"
-                  value={reg.pickupAuthorized || "—"}
+                  label="Контакт #1"
+                  value={pickupContactValue(
+                    reg.pickup1Name,
+                    reg.pickup1Phone,
+                    reg.pickup1Relation
+                  )}
                 />
                 <Field
-                  label="Может покидать лагерь самостоятельно"
-                  value={reg.childCanLeaveAlone ? "Да" : "Нет"}
+                  label="Контакт #2"
+                  value={pickupContactValue(
+                    reg.pickup2Name,
+                    reg.pickup2Phone,
+                    reg.pickup2Relation
+                  )}
                 />
+                {reg.pickupAuthorized && (
+                  <div className="md:col-span-2">
+                    <Field
+                      label="Разрешено забирать (старая форма)"
+                      value={reg.pickupAuthorized}
+                    />
+                  </div>
+                )}
               </div>
 
               <SubHeading>Здоровье</SubHeading>
@@ -311,6 +341,22 @@ export default function RegistrationModal({
                       ? `Да${reg.medicationDetails ? " — " + reg.medicationDetails : ""}`
                       : "Нет"
                   }
+                />
+                <Field
+                  label="Особенности характера / психики"
+                  value={
+                    reg.hasSpecialTraits
+                      ? `Да${reg.specialTraitsDetails ? " — " + reg.specialTraitsDetails : ""}`
+                      : "Нет"
+                  }
+                />
+                <Field
+                  label="Прививка от энцефалита"
+                  value={yesNoLabel(reg.hasEncephalitisVaccine)}
+                />
+                <Field
+                  label="Был в других лагерях"
+                  value={yesNoLabel(reg.participatedOtherCamps)}
                 />
                 <Field
                   label="Физическая активность"
@@ -511,6 +557,25 @@ function Field({
       </div>
     </div>
   );
+}
+
+function pickupContactValue(
+  name?: string,
+  phone?: string,
+  relation?: string
+) {
+  const parts = [
+    name,
+    relation,
+    phone ? `+371 ${phone}` : "",
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : "—";
+}
+
+function yesNoLabel(v?: string) {
+  if (v === "yes") return "Да";
+  if (v === "no") return "Нет";
+  return "—";
 }
 
 function SubHeading({ children }: { children: React.ReactNode }) {

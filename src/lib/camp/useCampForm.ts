@@ -12,7 +12,9 @@ import {
   isDate,
   isEmail,
   isFilled,
+  isPersonalCode,
   isPhone,
+  isYesNo,
   STEP_REQUIRED,
   validate,
 } from "./validation";
@@ -82,17 +84,29 @@ function toApiPayload(data: FormData) {
     childGender: GENDER_LABEL[data.childGender] || "",
     childDOB: data.childBirth,
     childAge: age,
-    childPersonalId: "",
+    childPersonalId: data.childPersonalCode,
     childLanguage: LANGUAGE_LABEL[data.childLanguage] || data.childLanguage,
     city: data.childCity,
-    pickupAuthorized: data.pickupPersons,
-    childCanLeaveAlone: data.selfDismissal,
+    // Structured pickup contacts (new form)
+    pickup1Name: data.pickup1Name,
+    pickup1Phone: data.pickup1Phone,
+    pickup1Relation: data.pickup1Relation,
+    pickup2Name: data.pickup2Name,
+    pickup2Phone: data.pickup2Phone,
+    pickup2Relation: data.pickup2Relation,
+    // Legacy fields - kept empty for backwards compatibility.
+    pickupAuthorized: "",
+    childCanLeaveAlone: false,
     hasAllergies: data.hasAllergies === "yes",
     allergiesDetails: data.allergiesText,
     hasChronicIllness: data.hasChronic === "yes",
     chronicDetails: data.chronicText,
     takesMedication: data.hasMeds === "yes",
     medicationDetails: data.medsText,
+    hasSpecialTraits: data.hasSpecialTraits === "yes",
+    specialTraitsDetails: data.specialTraitsText,
+    hasEncephalitisVaccine: data.encephalitisVaccine,
+    participatedOtherCamps: data.participatedOtherCamps,
     physicalActivity: ACTIVITY_LABEL[data.physicalActivity],
     physicalLimitations: data.physicalLimitations,
     dietRestrictions: DIET_LABEL[data.diet],
@@ -144,8 +158,12 @@ export function useCampForm() {
       const v = data[k];
       if (typeof v === "boolean") return v;
       if (k === "parentEmail") return isEmail(v);
-      if (k === "parentPhone") return isPhone(v);
+      if (k === "parentPhone" || k === "pickup1Phone" || k === "pickup2Phone")
+        return isPhone(v);
       if (k === "childBirth") return isDate(v);
+      if (k === "childPersonalCode") return isPersonalCode(v);
+      if (k === "encephalitisVaccine" || k === "participatedOtherCamps")
+        return isYesNo(v);
       return isFilled(v);
     });
   }, [data, stepId]);

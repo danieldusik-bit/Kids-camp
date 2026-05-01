@@ -22,7 +22,7 @@ export const CAMPS: {
   {
     id: "kids",
     label: "Детский лагерь",
-    ageRange: "7 — 12 лет",
+    ageRange: "6 — 12 лет",
     dates: "28 июня — 4 июля 2026",
     startDate: "2026-06-28",
     emoji: "🏕️",
@@ -30,7 +30,7 @@ export const CAMPS: {
   {
     id: "teens",
     label: "Подростковый лагерь",
-    ageRange: "13 — 17 лет",
+    ageRange: "13 — 18 лет",
     dates: "26 июля — 1 августа 2026",
     startDate: "2026-07-26",
     emoji: "🔥",
@@ -55,17 +55,26 @@ export type FormData = {
   childName: string;
   childGender: "" | "boy" | "girl";
   childBirth: string;
+  childPersonalCode: string;
   childCity: string;
   childLanguage: string;
   groupWith: string;
-  pickupPersons: string;
-  selfDismissal: boolean;
+  pickup1Name: string;
+  pickup1Phone: string;
+  pickup1Relation: string;
+  pickup2Name: string;
+  pickup2Phone: string;
+  pickup2Relation: string;
   hasAllergies: "yes" | "no";
   allergiesText: string;
   hasChronic: "yes" | "no";
   chronicText: string;
   hasMeds: "yes" | "no";
   medsText: string;
+  hasSpecialTraits: "yes" | "no";
+  specialTraitsText: string;
+  encephalitisVaccine: "" | "yes" | "no";
+  participatedOtherCamps: "" | "yes" | "no";
   physicalActivity: "allowed" | "limited";
   physicalLimitations: string;
   diet: "none" | "veg" | "vegan" | "other";
@@ -88,17 +97,26 @@ export const INITIAL_DATA: FormData = {
   childName: "",
   childGender: "",
   childBirth: "",
+  childPersonalCode: "",
   childCity: "",
   childLanguage: "Русский",
   groupWith: "",
-  pickupPersons: "",
-  selfDismissal: false,
+  pickup1Name: "",
+  pickup1Phone: "",
+  pickup1Relation: "",
+  pickup2Name: "",
+  pickup2Phone: "",
+  pickup2Relation: "",
   hasAllergies: "no",
   allergiesText: "",
   hasChronic: "no",
   chronicText: "",
   hasMeds: "no",
   medsText: "",
+  hasSpecialTraits: "no",
+  specialTraitsText: "",
+  encephalitisVaccine: "",
+  participatedOtherCamps: "",
   physicalActivity: "allowed",
   physicalLimitations: "",
   diet: "none",
