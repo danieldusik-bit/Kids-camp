@@ -96,28 +96,18 @@ export function StepPayment({
         </div>
       </div>
 
-      {/* Alternative: card payment via Stripe Buy Button */}
-      <div className="bg-surface-soft rounded-2xl p-5 border border-line flex flex-col gap-3">
-        <div>
-          <h3 className="font-display text-[19px] font-semibold mt-0 mb-1 text-ink">
-            Или картой онлайн
-          </h3>
-          <p className="text-[13px] text-ink-mute mt-0 mb-0">
-            Альтернативно — можно оплатить картой через Stripe. Откроется
-            защищённая страница оплаты.
-          </p>
-        </div>
-        <Script
-          id="stripe-buy-button-js"
-          src="https://js.stripe.com/v3/buy-button.js"
-          strategy="afterInteractive"
-        />
-        <div className="flex justify-start">
-          <stripe-buy-button
-            buy-button-id="buy_btn_1TSsHQE9EzqEVnFDuAYpNLEy"
-            publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
-          ></stripe-buy-button>
-        </div>
+      {/* Alternative: card payment via Stripe Buy Button (compact) */}
+      <Script
+        id="stripe-buy-button-js"
+        src="https://js.stripe.com/v3/buy-button.js"
+        strategy="afterInteractive"
+      />
+      <div className="flex flex-col gap-2">
+        <span className="text-[13px] text-ink-mute">или оплатить картой:</span>
+        <stripe-buy-button
+          buy-button-id="buy_btn_1TSsHQE9EzqEVnFDuAYpNLEy"
+          publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
+        ></stripe-buy-button>
       </div>
 
       {/* Camp rules */}
