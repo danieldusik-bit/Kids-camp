@@ -97,6 +97,92 @@ export function StepPayment({
             Оплата при подписании договора. Сумма передаётся координатору
             лагеря в день встречи.
           </p>
+
+          {/* Wallet + banknote illustration */}
+          <div
+            className="flex-1 flex items-center justify-center my-4"
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 96 96"
+              width="120"
+              height="120"
+              fill="none"
+              role="img"
+              aria-label="Наличные деньги"
+            >
+              {/* Banknote sliding out from the top of the wallet */}
+              <rect
+                x="26"
+                y="10"
+                width="46"
+                height="26"
+                rx="3"
+                fill="#fdf5dd"
+                stroke="#c89028"
+                strokeWidth="2"
+              />
+              <circle
+                cx="49"
+                cy="23"
+                r="6.5"
+                fill="none"
+                stroke="#c89028"
+                strokeWidth="1.6"
+              />
+              <text
+                x="49"
+                y="27"
+                textAnchor="middle"
+                fontFamily="Georgia, 'Times New Roman', serif"
+                fontSize="11"
+                fontWeight="700"
+                fill="#c89028"
+              >
+                €
+              </text>
+
+              {/* Wallet body */}
+              <rect
+                x="10"
+                y="32"
+                width="76"
+                height="52"
+                rx="7"
+                fill="#e8d5a4"
+                stroke="#7a5530"
+                strokeWidth="2.4"
+              />
+
+              {/* Wallet flap fold line */}
+              <path d="M10 50 L86 50" stroke="#7a5530" strokeWidth="1.6" />
+
+              {/* Clasp */}
+              <circle cx="70" cy="67" r="4" fill="#7a5530" />
+
+              {/* Small coin next to the wallet */}
+              <circle
+                cx="20"
+                cy="80"
+                r="7"
+                fill="#e8c971"
+                stroke="#7a5530"
+                strokeWidth="1.6"
+              />
+              <text
+                x="20"
+                y="84"
+                textAnchor="middle"
+                fontFamily="Georgia, 'Times New Roman', serif"
+                fontSize="9"
+                fontWeight="700"
+                fill="#7a5530"
+              >
+                €
+              </text>
+            </svg>
+          </div>
+
           <div className="flex items-center gap-3 mt-auto">
             <input
               type="checkbox"
