@@ -74,40 +74,49 @@ export function StepPayment({
         </span>
       </label>
 
-      {/* Payment details */}
-      <div className="bg-tint rounded-2xl p-5 border border-line">
-        <h3 className="font-display text-[19px] font-semibold mt-0 mb-2 text-ink">
-          Реквизиты для оплаты
-        </h3>
-        <p className="text-[13px] text-ink-mute mt-0 mb-3">
-          Оплата производится переводом (ziedojums) на счёт организации или
-          наличными деньгами.
-        </p>
-        <div className="bg-surface rounded-xl p-4 font-mono text-[13.5px] text-ink-soft border border-line">
-          <div className="font-semibold text-ink">
-            Rīgas Misiones Baptistu Draudze
-          </div>
-          <div className="font-bold text-accent-strong">
-            LV80UNLA0050011859310
-          </div>
-          <div className="font-sans text-ink-mute text-[12.5px] mt-2">
-            Цель платежа: ZIEDOJUMS bērnu nometnei 2026 + имя и фамилия ребёнка
-          </div>
-        </div>
-      </div>
-
-      {/* Alternative: card payment via Stripe Buy Button (compact) */}
+      {/* Payment options: bank (left) + Stripe (right) on desktop, stacked on mobile */}
       <Script
         id="stripe-buy-button-js"
         src="https://js.stripe.com/v3/buy-button.js"
         strategy="afterInteractive"
       />
-      <div className="flex flex-col gap-2">
-        <span className="text-[13px] text-ink-mute">или оплатить картой:</span>
-        <stripe-buy-button
-          buy-button-id="buy_btn_1TSsHQE9EzqEVnFDuAYpNLEy"
-          publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
-        ></stripe-buy-button>
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
+        {/* Bank transfer */}
+        <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col">
+          <h3 className="font-display text-[19px] font-semibold mt-0 mb-2 text-ink">
+            Банковский перевод
+          </h3>
+          <p className="text-[13px] text-ink-mute mt-0 mb-3">
+            Перевод (ziedojums) на счёт организации или наличными.
+          </p>
+          <div className="bg-surface rounded-xl p-4 font-mono text-[13.5px] text-ink-soft border border-line flex-1">
+            <div className="font-semibold text-ink">
+              Rīgas Misiones Baptistu Draudze
+            </div>
+            <div className="font-bold text-accent-strong break-all">
+              LV80UNLA0050011859310
+            </div>
+            <div className="font-sans text-ink-mute text-[12.5px] mt-2">
+              Цель: ZIEDOJUMS bērnu nometnei 2026 + имя ребёнка
+            </div>
+          </div>
+        </div>
+
+        {/* Card via Stripe */}
+        <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col">
+          <h3 className="font-display text-[19px] font-semibold mt-0 mb-2 text-ink">
+            Картой онлайн
+          </h3>
+          <p className="text-[13px] text-ink-mute mt-0 mb-3">
+            Защищённая страница оплаты Stripe.
+          </p>
+          <div className="flex-1 flex items-center justify-center">
+            <stripe-buy-button
+              buy-button-id="buy_btn_1TSsHQE9EzqEVnFDuAYpNLEy"
+              publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
+            ></stripe-buy-button>
+          </div>
+        </div>
       </div>
 
       {/* Camp rules */}
