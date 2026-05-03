@@ -85,6 +85,7 @@ export type FormData = {
   notes: string;
   source: string;
   largeFamily: boolean;
+  payCash: boolean;
   confirmTrue: boolean;
   confirmFirst: boolean;
   confirmRules: boolean;
@@ -130,6 +131,7 @@ export const INITIAL_DATA: FormData = {
   notes: "",
   source: "",
   largeFamily: false,
+  payCash: false,
   confirmTrue: false,
   confirmFirst: false,
   confirmRules: false,

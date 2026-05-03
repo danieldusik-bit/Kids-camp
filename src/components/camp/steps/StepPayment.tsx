@@ -74,33 +74,41 @@ export function StepPayment({
         </span>
       </label>
 
-      {/* Payment options: bank (left) + Stripe (right) on desktop, stacked on mobile */}
+      {/* Payment options: cash (left) + Stripe (right) on desktop, stacked on mobile */}
       <Script
         id="stripe-buy-button-js"
         src="https://js.stripe.com/v3/buy-button.js"
         strategy="afterInteractive"
       />
       <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
-        {/* Bank transfer */}
-        <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col">
+        {/* Cash on contract handover */}
+        <label
+          className={[
+            "rounded-2xl p-5 border flex flex-col cursor-pointer transition-all",
+            data.payCash
+              ? "bg-accent-soft/50 border-accent ring-4 ring-accent-soft"
+              : "bg-tint border-line hover:border-line-strong",
+          ].join(" ")}
+        >
           <h3 className="font-display text-[19px] font-semibold mt-0 mb-2 text-ink">
-            Банковский перевод
+            Наличными
           </h3>
-          <p className="text-[13px] text-ink-mute mt-0 mb-3">
-            Перевод (ziedojums) на счёт организации или наличными.
+          <p className="text-[13px] text-ink-mute mt-0 mb-4">
+            Оплата при подписании договора. Сумма передаётся координатору
+            лагеря в день встречи.
           </p>
-          <div className="bg-surface rounded-xl p-4 font-mono text-[13.5px] text-ink-soft border border-line flex-1">
-            <div className="font-semibold text-ink">
-              Rīgas Misiones Baptistu Draudze
-            </div>
-            <div className="font-bold text-accent-strong break-all">
-              LV80UNLA0050011859310
-            </div>
-            <div className="font-sans text-ink-mute text-[12.5px] mt-2">
-              Цель: ZIEDOJUMS bērnu nometnei 2026 + имя ребёнка
-            </div>
+          <div className="flex items-center gap-3 mt-auto">
+            <input
+              type="checkbox"
+              checked={data.payCash}
+              onChange={(e) => set("payCash", e.target.checked)}
+              className="w-[18px] h-[18px] accent-[rgb(var(--accent))] flex-shrink-0"
+            />
+            <span className="text-[14px] text-ink font-medium">
+              Заплачу наличными при подписании договора
+            </span>
           </div>
-        </div>
+        </label>
 
         {/* Card via Stripe */}
         <div className="bg-tint rounded-2xl p-5 border border-line flex flex-col">

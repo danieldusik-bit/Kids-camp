@@ -121,6 +121,7 @@ function toApiPayload(data: FormData) {
     confirmFirstAid: data.confirmFirst,
     confirmRules: data.confirmRules,
     confirmPayment: true,
+    paymentMethod: data.payCash ? "cash" : "stripe",
     largeFamily: data.largeFamily,
     healthInfo: "",
   };

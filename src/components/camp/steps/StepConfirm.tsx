@@ -222,6 +222,12 @@ export function StepConfirm({
                   },
                 ]
               : []),
+            {
+              label: "Способ оплаты",
+              value: data.payCash
+                ? "Наличными при подписании договора"
+                : "Картой онлайн (Stripe)",
+            },
           ]}
         />
       </div>

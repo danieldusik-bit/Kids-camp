@@ -103,6 +103,9 @@ export async function POST(request: Request) {
         confirmRules: !!body.confirmRules,
         confirmPayment: !!body.confirmPayment,
 
+        // Payment intent
+        paymentMethod: body.paymentMethod || "",
+
         // Legacy
         healthInfo: body.healthInfo || "",
         status: "Новая",

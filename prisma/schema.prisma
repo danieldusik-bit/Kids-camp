@@ -88,6 +88,9 @@ model Registration {
   confirmRules      Boolean @default(false)
   confirmPayment    Boolean @default(false)
 
+  // Payment intent: "stripe" | "cash" | ""
+  paymentMethod String @default("")
+
   // Legacy / general health field kept for compatibility
   healthInfo    String @default("")
   internalNotes String @default("")

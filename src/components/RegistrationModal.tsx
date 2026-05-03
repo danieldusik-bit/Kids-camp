@@ -49,6 +49,7 @@ interface Registration {
   dietDetails?: string;
   additionalInfo?: string;
   hearAboutUs?: string;
+  paymentMethod?: string;
   healthInfo: string;
   internalNotes: string;
   createdAt: string;
@@ -407,6 +408,10 @@ export default function RegistrationModal({
               <SubHeading>Дополнительно</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field
+                  label="Способ оплаты"
+                  value={paymentMethodLabel(reg.paymentMethod)}
+                />
+                <Field
                   label="Дополнительная информация"
                   value={reg.additionalInfo || "—"}
                 />
@@ -591,6 +596,12 @@ function pickupContactValue(
 function yesNoLabel(v?: string) {
   if (v === "yes") return "Да";
   if (v === "no") return "Нет";
+  return "—";
+}
+
+function paymentMethodLabel(v?: string) {
+  if (v === "cash") return "Наличными при подписании договора";
+  if (v === "stripe") return "Картой онлайн (Stripe)";
   return "—";
 }
 
