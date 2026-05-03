@@ -84,7 +84,6 @@ export function StepChild({
         error={errors.childPersonalCode}
         placeholder="010203-12345"
         hint="Латвийский personas kods ребёнка — формат 6 цифр - 5 цифр."
-        inputMode="numeric"
       />
 
       <Field
