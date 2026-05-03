@@ -1,6 +1,25 @@
 "use client";
+import Script from "next/script";
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
 import type { useCampForm } from "@/lib/camp/useCampForm";
 import { CAMP, CAMP_RULES } from "@/lib/camp/camp";
+
+// Stripe's buy-button.js registers a <stripe-buy-button> custom element.
+// React/TypeScript needs the intrinsic declared so JSX accepts it.
+declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      "stripe-buy-button": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement> & {
+          "buy-button-id": string;
+          "publishable-key": string;
+        },
+        HTMLElement
+      >;
+    }
+  }
+}
 
 export function StepPayment({
   form,
@@ -74,6 +93,30 @@ export function StepPayment({
           <div className="font-sans text-ink-mute text-[12.5px] mt-2">
             Цель платежа: ZIEDOJUMS bērnu nometnei 2026 + имя и фамилия ребёнка
           </div>
+        </div>
+      </div>
+
+      {/* Alternative: card payment via Stripe Buy Button */}
+      <div className="bg-surface-soft rounded-2xl p-5 border border-line flex flex-col gap-3">
+        <div>
+          <h3 className="font-display text-[19px] font-semibold mt-0 mb-1 text-ink">
+            Или картой онлайн
+          </h3>
+          <p className="text-[13px] text-ink-mute mt-0 mb-0">
+            Альтернативно — можно оплатить картой через Stripe. Откроется
+            защищённая страница оплаты.
+          </p>
+        </div>
+        <Script
+          id="stripe-buy-button-js"
+          src="https://js.stripe.com/v3/buy-button.js"
+          strategy="afterInteractive"
+        />
+        <div className="flex justify-start">
+          <stripe-buy-button
+            buy-button-id="buy_btn_1TSsHQE9EzqEVnFDuAYpNLEy"
+            publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
+          ></stripe-buy-button>
         </div>
       </div>
 
