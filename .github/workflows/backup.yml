@@ -1,0 +1,31 @@
+name: Weekly DB backup → email
+
+on:
+  schedule:
+    # Mondays 07:00 UTC ≈ 10:00 Riga (EEST summer / EET winter)
+    - cron: "0 7 * * 1"
+  workflow_dispatch: # manual trigger from Actions tab
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Dump DB and email
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BACKUP_EMAIL_TO: ${{ secrets.BACKUP_EMAIL_TO }}
+          BACKUP_EMAIL_FROM: ${{ secrets.BACKUP_EMAIL_FROM }}
+        run: npx tsx scripts/backup-db.ts

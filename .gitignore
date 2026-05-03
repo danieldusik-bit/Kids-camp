@@ -44,3 +44,6 @@ next-env.d.ts
 
 # graphify
 /graphify-out/
+
+# backup runner artifacts (PII — must never be committed)
+/tmp-backup/
