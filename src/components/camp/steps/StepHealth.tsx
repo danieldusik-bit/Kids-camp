@@ -136,6 +136,25 @@ export function StepHealth({
 
       <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
         <Chips
+          label="Умеет ли ребёнок плавать?"
+          required
+          value={data.swimmingAbility}
+          onChange={(v) =>
+            set("swimmingAbility", v as "" | "yes" | "no" | "weak")
+          }
+          options={[
+            { value: "yes", label: "Да, умеет" },
+            { value: "weak", label: "Умеет, но плохо" },
+            { value: "no", label: "Нет, не умеет" },
+          ]}
+        />
+        {errors.swimmingAbility && (
+          <div className="text-xs text-err">{errors.swimmingAbility}</div>
+        )}
+      </div>
+
+      <div className="bg-surface-soft border border-line rounded-2xl p-5 flex flex-col gap-3">
+        <Chips
           label="Физическая активность"
           value={data.physicalActivity}
           onChange={(v) =>

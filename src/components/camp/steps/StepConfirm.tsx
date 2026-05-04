@@ -186,6 +186,17 @@ export function StepConfirm({
                   : "—",
             },
             {
+              label: "Умеет плавать",
+              value:
+                data.swimmingAbility === "yes"
+                  ? "Да"
+                  : data.swimmingAbility === "weak"
+                  ? "Умеет, но плохо"
+                  : data.swimmingAbility === "no"
+                  ? "Нет"
+                  : "—",
+            },
+            {
               label: "Физическая активность",
               value:
                 data.physicalActivity === "limited"

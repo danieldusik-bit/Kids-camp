@@ -86,6 +86,7 @@ export async function POST(request: Request) {
         specialTraitsDetails: body.specialTraitsDetails || "",
         hasEncephalitisVaccine: body.hasEncephalitisVaccine || "",
         participatedOtherCamps: body.participatedOtherCamps || "",
+        swimmingAbility: body.swimmingAbility || "",
         physicalActivity: body.physicalActivity || "Разрешено",
         physicalLimitations: body.physicalLimitations || "",
 

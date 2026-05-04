@@ -43,6 +43,7 @@ interface Registration {
   specialTraitsDetails?: string;
   hasEncephalitisVaccine?: string;
   participatedOtherCamps?: string;
+  swimmingAbility?: string;
   physicalActivity?: string;
   physicalLimitations?: string;
   dietRestrictions?: string;
@@ -376,6 +377,10 @@ export default function RegistrationModal({
                   value={yesNoLabel(reg.participatedOtherCamps)}
                 />
                 <Field
+                  label="Умеет плавать"
+                  value={swimmingLabel(reg.swimmingAbility)}
+                />
+                <Field
                   label="Физическая активность"
                   value={
                     reg.physicalActivity === "С ограничениями"
@@ -602,6 +607,13 @@ function yesNoLabel(v?: string) {
 function paymentMethodLabel(v?: string) {
   if (v === "cash") return "Наличными при подписании договора";
   if (v === "stripe") return "Картой онлайн (Stripe)";
+  return "—";
+}
+
+function swimmingLabel(v?: string) {
+  if (v === "yes") return "Да, умеет";
+  if (v === "weak") return "Умеет, но плохо";
+  if (v === "no") return "Нет, не умеет";
   return "—";
 }
 

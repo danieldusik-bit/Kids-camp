@@ -13,6 +13,9 @@ export const isPersonalCode = (v: unknown) =>
   /^\d{6}-\d{5}$/.test(String(v ?? "").trim());
 /** "yes" / "no" answer must be picked (non-empty). */
 export const isYesNo = (v: unknown) => v === "yes" || v === "no";
+/** Swimming chip — one of three values must be picked. */
+export const isSwimmingAnswer = (v: unknown) =>
+  v === "yes" || v === "no" || v === "weak";
 
 export type Errors = Partial<Record<keyof FormData, string>>;
 
@@ -75,6 +78,11 @@ export function validate(
     isYesNo(data.participatedOtherCamps),
     "Выберите Да или Нет"
   );
+  need(
+    "swimmingAbility",
+    isSwimmingAnswer(data.swimmingAbility),
+    "Выберите вариант"
+  );
   if (force) {
     if (!data.confirmTrue) errs.confirmTrue = "_";
     if (!data.confirmFirst) errs.confirmFirst = "_";
@@ -98,7 +106,7 @@ export const STEP_REQUIRED: Record<StepId, (keyof FormData)[]> = {
     "pickup2Phone",
     "pickup2Relation",
   ],
-  health: ["encephalitisVaccine", "participatedOtherCamps"],
+  health: ["encephalitisVaccine", "participatedOtherCamps", "swimmingAbility"],
   payment: [],
   confirm: ["confirmTrue", "confirmFirst", "confirmRules"],
 };

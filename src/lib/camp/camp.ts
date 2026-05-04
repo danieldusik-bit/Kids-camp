@@ -78,6 +78,7 @@ export type FormData = {
   specialTraitsText: string;
   encephalitisVaccine: "" | "yes" | "no";
   participatedOtherCamps: "" | "yes" | "no";
+  swimmingAbility: "" | "yes" | "no" | "weak";
   physicalActivity: "allowed" | "limited";
   physicalLimitations: string;
   diet: "none" | "veg" | "vegan" | "other";
@@ -124,6 +125,7 @@ export const INITIAL_DATA: FormData = {
   specialTraitsText: "",
   encephalitisVaccine: "",
   participatedOtherCamps: "",
+  swimmingAbility: "",
   physicalActivity: "allowed",
   physicalLimitations: "",
   diet: "none",

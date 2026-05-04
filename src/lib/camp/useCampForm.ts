@@ -14,6 +14,7 @@ import {
   isFilled,
   isPersonalCode,
   isPhone,
+  isSwimmingAnswer,
   isYesNo,
   STEP_REQUIRED,
   validate,
@@ -111,6 +112,7 @@ function toApiPayload(data: FormData) {
     specialTraitsDetails: data.specialTraitsText,
     hasEncephalitisVaccine: data.encephalitisVaccine,
     participatedOtherCamps: data.participatedOtherCamps,
+    swimmingAbility: data.swimmingAbility,
     physicalActivity: ACTIVITY_LABEL[data.physicalActivity],
     physicalLimitations: data.physicalLimitations,
     dietRestrictions: DIET_LABEL[data.diet],
@@ -169,6 +171,7 @@ export function useCampForm() {
       if (k === "childPersonalCode") return isPersonalCode(v);
       if (k === "encephalitisVaccine" || k === "participatedOtherCamps")
         return isYesNo(v);
+      if (k === "swimmingAbility") return isSwimmingAnswer(v);
       if (k === "declaredAddress") return isFilled(v);
       return isFilled(v);
     });
@@ -256,8 +259,10 @@ export function useCampForm() {
   }, []);
 
   /**
-   * Add another child — keep parent contacts, camp choice and large-family
-   * toggle; reset only child + health + confirmations.
+   * Add another child — keep family-level data (parent + emergency contacts,
+   * pickup contacts, addresses, camp choice, payment method, large-family
+   * toggle); reset only the per-child fields (name, DOB, personas kods,
+   * health answers, confirmations).
    * Jumps the wizard back to the parent step so the child name field is at
    * the top.
    */
@@ -270,6 +275,20 @@ export function useCampForm() {
       parentEmail: d.parentEmail,
       emergencyName: d.emergencyName,
       emergencyPhone: d.emergencyPhone,
+      // Addresses are family-level
+      declaredAddress: d.declaredAddress,
+      actualAddress: d.actualAddress,
+      actualSameAsDeclared: d.actualSameAsDeclared,
+      childCity: d.childCity,
+      // Pickup contacts are family-level
+      pickup1Name: d.pickup1Name,
+      pickup1Phone: d.pickup1Phone,
+      pickup1Relation: d.pickup1Relation,
+      pickup2Name: d.pickup2Name,
+      pickup2Phone: d.pickup2Phone,
+      pickup2Relation: d.pickup2Relation,
+      // Payment method usually applies to the whole family
+      payCash: d.payCash,
       largeFamily: d.largeFamily,
     }));
     setTouched({});

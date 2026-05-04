@@ -73,6 +73,7 @@ model Registration {
   specialTraitsDetails    String  @default("")
   hasEncephalitisVaccine  String  @default("")
   participatedOtherCamps  String  @default("")
+  swimmingAbility         String  @default("")
 
   // Diet
   dietRestrictions String @default("нет")
