@@ -210,6 +210,10 @@ export function StepPayment({
               publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
             ></stripe-buy-button>
           </div>
+          <p className="text-[12px] text-ink-mute mt-3 mb-0">
+            Форма автоматически сохраняется — после оплаты можно вернуться
+            на эту вкладку и завершить регистрацию.
+          </p>
         </div>
       </div>
 

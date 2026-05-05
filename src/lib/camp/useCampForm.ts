@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CAMPS,
   INITIAL_DATA,
@@ -129,6 +129,15 @@ function toApiPayload(data: FormData) {
   };
 }
 
+/**
+ * localStorage key for the wizard draft.
+ *
+ * Bump the version suffix whenever FormData gets a breaking change so old
+ * saved drafts get ignored cleanly instead of causing weird half-filled
+ * forms after a deploy.
+ */
+const STORAGE_KEY = "kids-camp-portal:form:v1";
+
 export function useCampForm() {
   const [data, setData] = useState<FormData>(INITIAL_DATA);
   const [touched, setTouched] = useState<
@@ -138,6 +147,60 @@ export function useCampForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  // Hydration gate so the persistence effect doesn't overwrite the saved
+  // draft with INITIAL_DATA before we get a chance to load it.
+  const hydratedRef = useRef(false);
+
+  /** Restore draft from localStorage on first mount (browser only). */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          data?: Partial<FormData>;
+          stepIdx?: number;
+        };
+        if (parsed.data && typeof parsed.data === "object") {
+          setData((d) => ({ ...d, ...parsed.data }));
+        }
+        if (
+          typeof parsed.stepIdx === "number" &&
+          parsed.stepIdx >= 0 &&
+          parsed.stepIdx < STEPS.length
+        ) {
+          setStepIdx(parsed.stepIdx);
+        }
+      }
+    } catch {
+      // Corrupt or quota-exceeded — ignore and start fresh.
+    }
+    hydratedRef.current = true;
+  }, []);
+
+  /** Persist draft on every change (after the first hydration). */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!hydratedRef.current) return;
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ data, stepIdx })
+      );
+    } catch {
+      // Storage might be disabled (private mode, full disk) — non-fatal.
+    }
+  }, [data, stepIdx]);
+
+  const clearStorage = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const set = useCallback(
     <K extends keyof FormData>(k: K, v: FormData[K]) => {
@@ -239,6 +302,9 @@ export function useCampForm() {
         const j = await res.json().catch(() => ({}));
         throw new Error(j.error || "Не удалось отправить заявку");
       }
+      // Submission succeeded — wipe the persisted draft so a refresh on
+      // the success screen doesn't restore the just-submitted form.
+      clearStorage();
       setSubmitted(true);
       scrollToFormTop();
     } catch (e: any) {
@@ -246,17 +312,18 @@ export function useCampForm() {
     } finally {
       setSubmitting(false);
     }
-  }, [data]);
+  }, [data, clearStorage]);
 
   /** Full reset — start a fresh new application from scratch. */
   const resetAll = useCallback(() => {
+    clearStorage();
     setData(INITIAL_DATA);
     setTouched({});
     setStepIdx(0);
     setSubmitted(false);
     setSubmitError("");
     scrollToFormTop();
-  }, []);
+  }, [clearStorage]);
 
   /**
    * Add another child — keep family-level data (parent + emergency contacts,
