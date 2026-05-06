@@ -1,6 +1,25 @@
 "use client";
+import Script from "next/script";
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
 import type { FormData } from "@/lib/camp/camp";
 import { CAMPS } from "@/lib/camp/camp";
+
+// Stripe's buy-button.js registers a <stripe-buy-button> custom element.
+// React/TypeScript needs the intrinsic declared so JSX accepts it.
+declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      "stripe-buy-button": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement> & {
+          "buy-button-id": string;
+          "publishable-key": string;
+        },
+        HTMLElement
+      >;
+    }
+  }
+}
 
 type Props = {
   data: FormData;
@@ -73,6 +92,34 @@ export function Success({ data, onReset, onAddAnother }: Props) {
         . Если возникнут вопросы — звоните координатору лагеря{" "}
         <strong className="text-ink">Эсфирь · 27626010</strong>.
       </p>
+
+      {/* Stripe payment block — only when the family chose card payment */}
+      {data.paymentMethod === "stripe" && (
+        <div className="w-full max-w-[480px] mt-6 p-5 rounded-2xl bg-tint border border-line flex flex-col gap-3 items-center">
+          <h3 className="font-display text-[19px] font-semibold m-0 text-ink">
+            Оплата картой
+          </h3>
+          <p className="text-[13px] text-ink-mute m-0 text-center">
+            Защищённая страница Stripe. После оплаты придёт чек на e-mail.
+          </p>
+          <Script
+            id="stripe-buy-button-js"
+            src="https://js.stripe.com/v3/buy-button.js"
+            strategy="afterInteractive"
+          />
+          <stripe-buy-button
+            buy-button-id="buy_btn_1TSsHQE9EzqEVnFDuAYpNLEy"
+            publishable-key="pk_live_51T6VPaE9EzqEVnFD3daKO8jAHtCXkjrIWP5NoftTFAF2d5Gddklfq9wfpy3BXlvBYlTOOtTnCnv49uMB6mmyjf1q00icVSQjNP"
+          ></stripe-buy-button>
+        </div>
+      )}
+
+      {data.paymentMethod === "cash" && (
+        <div className="w-full max-w-[480px] mt-6 p-5 rounded-2xl bg-tint border border-line text-[14px] text-ink-soft leading-[1.5] text-center">
+          Вы выбрали оплату наличными при подписании договора. Координатор
+          свяжется с вами для согласования встречи.
+        </div>
+      )}
 
       {/* Send copy / call */}
       <div className="flex flex-wrap gap-3 justify-center mt-3">

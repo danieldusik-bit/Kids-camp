@@ -123,7 +123,7 @@ function toApiPayload(data: FormData) {
     confirmFirstAid: data.confirmFirst,
     confirmRules: data.confirmRules,
     confirmPayment: true,
-    paymentMethod: data.payCash ? "cash" : "stripe",
+    paymentMethod: data.paymentMethod,
     largeFamily: data.largeFamily,
     healthInfo: "",
   };
@@ -236,6 +236,7 @@ export function useCampForm() {
         return isYesNo(v);
       if (k === "swimmingAbility") return isSwimmingAnswer(v);
       if (k === "declaredAddress") return isFilled(v);
+      if (k === "paymentMethod") return v === "cash" || v === "stripe";
       return isFilled(v);
     });
   }, [data, stepId]);
@@ -355,7 +356,7 @@ export function useCampForm() {
       pickup2Phone: d.pickup2Phone,
       pickup2Relation: d.pickup2Relation,
       // Payment method usually applies to the whole family
-      payCash: d.payCash,
+      paymentMethod: d.paymentMethod,
       largeFamily: d.largeFamily,
     }));
     setTouched({});

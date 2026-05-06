@@ -1,5 +1,5 @@
 "use client";
-import { CAMPS, type CampId } from "@/lib/camp/camp";
+import { CAMPS, type CampId, type CampInfo } from "@/lib/camp/camp";
 import type { useCampForm } from "@/lib/camp/useCampForm";
 
 export function StepCamp({
@@ -8,8 +8,9 @@ export function StepCamp({
   form: ReturnType<typeof useCampForm>;
 }) {
   const { data, set } = form;
+  const selectedCamp = CAMPS.find((c) => c.id === data.camp) || null;
   return (
-    <div className="animate-fadeUp flex flex-col gap-4">
+    <div className="animate-fadeUp flex flex-col gap-5">
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-3">
         {CAMPS.map((c) => {
           const on = data.camp === c.id;
@@ -81,6 +82,41 @@ export function StepCamp({
             </button>
           );
         })}
+      </div>
+
+      {selectedCamp && <CampDescription camp={selectedCamp} />}
+    </div>
+  );
+}
+
+function CampDescription({ camp }: { camp: CampInfo }) {
+  return (
+    <div className="bg-surface-soft border border-line rounded-2xl p-5 sm:p-6 flex flex-col gap-4 animate-slideIn">
+      <div className="flex flex-col gap-2">
+        <h3 className="font-display text-[19px] font-semibold m-0 text-ink leading-snug">
+          {camp.tagline}
+        </h3>
+        <p className="text-[14px] text-ink-soft m-0 leading-[1.55]">
+          {camp.intro}
+        </p>
+      </div>
+      <div className="grid sm:grid-cols-2 grid-cols-1 gap-x-6 gap-y-4">
+        {camp.sections.map((s) => (
+          <div key={s.title} className="flex flex-col gap-1.5">
+            <div className="text-[14px] font-semibold text-ink">{s.title}</div>
+            <ul className="m-0 p-0 list-none flex flex-col gap-1">
+              {s.items.map((item, i) => (
+                <li
+                  key={i}
+                  className="flex gap-2 text-[13.5px] text-ink-soft leading-snug"
+                >
+                  <span className="text-accent-strong leading-tight">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   );

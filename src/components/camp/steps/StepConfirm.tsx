@@ -235,9 +235,12 @@ export function StepConfirm({
               : []),
             {
               label: "Способ оплаты",
-              value: data.payCash
-                ? "Наличными при подписании договора"
-                : "Картой онлайн (Stripe)",
+              value:
+                data.paymentMethod === "cash"
+                  ? "Наличными при подписании договора"
+                  : data.paymentMethod === "stripe"
+                  ? "Картой онлайн (Stripe)"
+                  : "—",
             },
           ]}
         />

@@ -83,6 +83,11 @@ export function validate(
     isSwimmingAnswer(data.swimmingAbility),
     "Выберите вариант"
   );
+  need(
+    "paymentMethod",
+    data.paymentMethod === "cash" || data.paymentMethod === "stripe",
+    "Выберите способ оплаты"
+  );
   if (force) {
     if (!data.confirmTrue) errs.confirmTrue = "_";
     if (!data.confirmFirst) errs.confirmFirst = "_";
@@ -107,6 +112,6 @@ export const STEP_REQUIRED: Record<StepId, (keyof FormData)[]> = {
     "pickup2Relation",
   ],
   health: ["encephalitisVaccine", "participatedOtherCamps", "swimmingAbility"],
-  payment: [],
+  payment: ["paymentMethod"],
   confirm: ["confirmTrue", "confirmFirst", "confirmRules"],
 };
