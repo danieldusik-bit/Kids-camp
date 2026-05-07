@@ -2,8 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Детский лагерь 2026 — Регистрация",
-  description: "Регистрация в детский лагерь 2026",
+  title: "Лагеря 2026 — Регистрация",
+  description:
+    "Детский (6–12) и подростковый (13–18) христианские лагеря — лето 2026, Norkalni.",
+  openGraph: {
+    title: "Лагеря 2026 — Регистрация",
+    description:
+      "Детский (6–12) и подростковый (13–18) христианские лагеря — лето 2026, Norkalni.",
+    type: "website",
+    locale: "ru_RU",
+  },
+  twitter: {
+    card: "summary",
+    title: "Лагеря 2026 — Регистрация",
+    description:
+      "Детский (6–12) и подростковый (13–18) христианские лагеря — лето 2026, Norkalni.",
+  },
 };
 
 export default function RootLayout({
