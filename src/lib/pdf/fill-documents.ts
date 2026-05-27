@@ -208,25 +208,33 @@ export async function fillContractPdf(
   const today = new Date();
   const dateInline = formatLatvianDateInline(today);
 
+  // Coordinates extracted directly from the template PDF via pdfjs-dist —
+  // each value matches the baseline of the actual underline / form field
+  // in the original document.
+
   // Page 1 ───────────────────────────────────────────────────────────────────
-  // "2026. gada ____. __________" — top-right; fills "15. maijā" style
-  drawAt(p1, font, dateInline, 470, 793, 10);
+  // "2026. gada ____. __________" at y=785. Header text starts at x=405,
+  // first blank starts around x=460.
+  drawAt(p1, font, dateInline, 463, 787, 10);
 
-  // Top blank row: (Vārds, Uzvārds) | (personas kods) | (dzīvesvietas adrese)
-  // We fill parent name + address; personas kods left blank for the parent
-  // to fill in by hand at signing.
-  drawAt(p1, font, reg.parentName, 60, 707, 10, 240);
-  drawAt(p1, font, reg.declaredAddress || "", 430, 707, 9, 150);
+  // Triple-row blanks at y=716, labels at y=702.
+  //   (Vārds, Uzvārds)        — underline x≈45-280
+  //   (personas kods)         — underline x≈285-380 (skip)
+  //   (dzīvesvietas adrese)   — underline x≈390-560
+  drawAt(p1, font, reg.parentName, 50, 718, 10, 220);
+  drawAt(p1, font, reg.declaredAddress || "", 425, 718, 9, 145);
 
-  // Section 1.1 — child name and personas kods (one line below "1. Līguma priekšmets")
-  drawAt(p1, font, reg.childName, 50, 538, 10, 280);
-  drawAt(p1, font, reg.childPersonalId, 345, 538, 10, 110);
+  // Section 1.1 — underline at y=551, labels at y=540.
+  drawAt(p1, font, reg.childName, 50, 553, 10, 230);
+  drawAt(p1, font, reg.childPersonalId, 300, 553, 10, 105);
 
   // Page 2 ───────────────────────────────────────────────────────────────────
-  // Section 5 — Vecāks/Aizbildnis (right column)
-  drawAt(p2, font, reg.parentName, 340, 188, 10, 200);
-  drawAt(p2, font, `+371 ${reg.parentPhone}`, 340, 152, 10, 200);
-  // Signature line — left blank
+  // Right column 5. Pušu rekvizīti — underlines at:
+  //   y=372 (Vārds, Uzvārds)
+  //   y=334 (Tālruņa nr.)
+  //   y=296 (paraksts) — left blank
+  drawAt(p2, font, reg.parentName, 325, 374, 10, 235);
+  drawAt(p2, font, `+371 ${reg.parentPhone}`, 325, 336, 10, 235);
 
   return await pdf.save();
 }
@@ -247,144 +255,117 @@ export async function fillAnnexesPdf(
     today.getMonth() + 1
   ).padStart(2, "0")}.${today.getFullYear()}`;
 
+  // Coordinates extracted directly from the template PDF via pdfjs-dist.
+
   // Page 1 — Anketa, fields 1-11 ────────────────────────────────────────────
-  // Top date: "2026.gada __. ________ Līguma par bērna dalību nometnē"
-  drawAt(p1, font, dateInline, 175, 793, 9);
+  // Header "2026.gada __. _________ Līguma par bērna dalību nometnē" at y=803.
+  drawAt(p1, font, dateInline, 340, 805, 9);
 
-  // 1. Bērna vārds, uzvārds
-  drawAt(p1, font, reg.childName, 165, 728, 10, 380);
+  // 1. "Bērna vārds, uzvārds:" — same-line text+underline at y=740.
+  drawAt(p1, font, reg.childName, 200, 742, 10, 370);
 
-  // 2. Bērna dzimšanas datums
-  drawAt(p1, font, reg.childDOB, 200, 685, 10, 200);
+  // 2. "Bērna dzimšanas datums:" — y=702.
+  drawAt(p1, font, reg.childDOB, 210, 704, 10, 230);
 
-  // 3. Bērna personas kods
-  drawAt(p1, font, reg.childPersonalId, 175, 640, 10, 200);
+  // 3. "Bērna personas kods:" — y=664.
+  drawAt(p1, font, reg.childPersonalId, 195, 666, 10, 240);
 
-  // 4. Peldētprasme — apvilkt vajadzīgo
-  //    options inline: "prot labi peldēt    ir mazliet mācījies/usies    neprot peldēt"
+  // 4. Peldētprasme — options at y=595:
+  //    "prot labi peldēt"          x=157
+  //    "ir mazliet mācījies/usies" x=251
+  //    "neprot peldēt"             x=388
   if (reg.swimmingAbility === "yes") {
-    drawOval(p1, 195, 580, 55, 10);
+    drawOval(p1, 200, 598, 47, 9);
   } else if (reg.swimmingAbility === "weak") {
-    drawOval(p1, 330, 580, 78, 10);
+    drawOval(p1, 313, 598, 65, 9);
   } else if (reg.swimmingAbility === "no") {
-    drawOval(p1, 463, 580, 45, 10);
+    drawOval(p1, 420, 598, 37, 9);
   }
 
-  // 5. Special traits text (only if explicitly answered)
+  // 5. Special traits — 2 blank lines at y=519 / y=500.
   if (reg.hasSpecialTraits && reg.specialTraitsDetails) {
-    drawWrapped(
-      p1,
-      font,
-      reg.specialTraitsDetails,
-      50,
-      517,
-      9,
-      495,
-      2,
-      14
-    );
+    drawWrapped(p1, font, reg.specialTraitsDetails, 50, 521, 9, 495, 2, 19);
   }
 
-  // 6. Veselības problēmas — combine allergies + chronic
+  // 6. Veselības problēmas — combine allergies + chronic. Blanks at y=405 / 386.
   const healthParts: string[] = [];
   if (reg.hasAllergies && reg.allergiesDetails)
-    healthParts.push("Aлерģijas: " + reg.allergiesDetails);
+    healthParts.push("Alerģijas: " + reg.allergiesDetails);
   if (reg.hasChronicIllness && reg.chronicDetails)
     healthParts.push("Hroniskas slimības: " + reg.chronicDetails);
   if (healthParts.length === 0 && !reg.hasAllergies && !reg.hasChronicIllness) {
     healthParts.push("Nav");
   }
   if (healthParts.length) {
-    drawWrapped(
-      p1,
-      font,
-      healthParts.join(". "),
-      50,
-      415,
-      9,
-      495,
-      2,
-      14
-    );
+    drawWrapped(p1, font, healthParts.join(". "), 50, 407, 9, 495, 2, 19);
   }
 
-  // 7. Medikamenti
+  // 7. Medikamenti — blanks at y=310 / 291.
   if (reg.takesMedication && reg.medicationDetails) {
-    drawWrapped(
-      p1,
-      font,
-      reg.medicationDetails,
-      50,
-      318,
-      9,
-      495,
-      2,
-      14
-    );
+    drawWrapped(p1, font, reg.medicationDetails, 50, 312, 9, 495, 2, 19);
   } else if (reg.takesMedication === false) {
-    drawAt(p1, font, "Nav", 50, 318, 9);
+    drawAt(p1, font, "Nav", 50, 312, 9);
   }
 
-  // 8. Encephalitis JĀ / NĒ
+  // 8. Encephalitis JĀ / NĒ — JĀ at x=295,y=253; NĒ at x=337,y=253.
   if (reg.hasEncephalitisVaccine === "yes") {
-    drawOval(p1, 290, 240, 12, 9);
+    drawOval(p1, 303, 256, 13, 9);
   } else if (reg.hasEncephalitisVaccine === "no") {
-    drawOval(p1, 325, 240, 12, 9);
+    drawOval(p1, 345, 256, 13, 9);
   }
 
-  // 9. Uzvedības problēmas — we do not collect, leave blank
+  // 9. Uzvedības problēmas — not collected, blank.
 
-  // 10. Vai iepriekš piedalījies — JĀ/NĒ
+  // 10. Vai iepriekš piedalījies — JĀ at x=309,y=158; NĒ at x=351,y=158.
   if (reg.participatedOtherCamps === "yes") {
-    drawOval(p1, 322, 130, 12, 9);
+    drawOval(p1, 317, 161, 13, 9);
   } else if (reg.participatedOtherCamps === "no") {
-    drawOval(p1, 358, 130, 12, 9);
+    drawOval(p1, 359, 161, 13, 9);
   }
 
-  // 11. Interešu loks — not collected, blank
+  // 11. Interešu loks — not collected, blank.
 
   // Page 2 — Anketa fields 12-14 ────────────────────────────────────────────
-  // 12. Pickup persons — three blank rows. We have two from the form.
+  // 12. Pickup persons — three numbered blanks at y=765, y=746, y=727.
   if (reg.pickup1Name) {
-    const line1 = formatPickup(
-      reg.pickup1Name,
-      reg.pickup1Relation,
-      reg.pickup1Phone
+    drawAt(
+      p2,
+      font,
+      formatPickup(reg.pickup1Name, reg.pickup1Relation, reg.pickup1Phone),
+      85,
+      767,
+      9,
+      460
     );
-    drawAt(p2, font, line1, 55, 758, 9, 490);
   }
   if (reg.pickup2Name) {
-    const line2 = formatPickup(
-      reg.pickup2Name,
-      reg.pickup2Relation,
-      reg.pickup2Phone
+    drawAt(
+      p2,
+      font,
+      formatPickup(reg.pickup2Name, reg.pickup2Relation, reg.pickup2Phone),
+      85,
+      748,
+      9,
+      460
     );
-    drawAt(p2, font, line2, 55, 735, 9, 490);
   }
   // Third row left blank.
 
-  // 13. Kas vēl būtu jāzina
+  // 13. Kas vēl būtu jāzina — blanks at y=671 / 652.
   if (reg.additionalInfo) {
-    drawWrapped(
-      p2,
-      font,
-      reg.additionalInfo,
-      55,
-      660,
-      9,
-      490,
-      2,
-      14
-    );
+    drawWrapped(p2, font, reg.additionalInfo, 50, 673, 9, 490, 2, 19);
   }
 
-  // 14. Parent name (signature + date blank for hand signing)
-  drawAt(p2, font, reg.parentName, 270, 540, 10, 290);
-  drawAt(p2, font, todayShort, 130, 478, 10);
+  // 14. "Bērna vecāka vai aizbildņa vārds, uzvārds:" at y=557.
+  drawAt(p2, font, reg.parentName, 260, 559, 10, 305);
+  // "Datums" at y=481.
+  drawAt(p2, font, todayShort, 90, 483, 10);
 
-  // Page 3 — Annex 2 (Rules), parent name at bottom ──────────────────────────
-  drawAt(p3, font, reg.parentName, 305, 130, 10, 250);
-  drawAt(p3, font, todayShort, 130, 75, 10);
+  // Page 3 — Annex 2 (Rules) ────────────────────────────────────────────────
+  // "Dalībnieka Vecāka/Aizbildņa vārds, uzvārds:" at y=118.
+  drawAt(p3, font, reg.parentName, 270, 120, 10, 305);
+  // "Datums" at y=67.
+  drawAt(p3, font, todayShort, 90, 69, 10);
 
   return await pdf.save();
 }
