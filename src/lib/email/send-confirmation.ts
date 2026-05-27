@@ -88,8 +88,11 @@ export async function sendConfirmationEmail({ registration }: SendArgs) {
         <li><strong>Pielikumi</strong> — анкета участника (предзаполнена) и правила лагеря.</li>
       </ol>
       <p style="margin:0 0 12px;">
-        Распечатайте, подпишите и принесите с собой в день регистрации лагеря
-        (<strong>Lāčplēša iela 117, Rīga</strong>) — или передайте раньше координатору.
+        Подпишите электронно и пришлите на
+        <a href="mailto:Kristiana.vjatere@gmail.com" style="color:#1f5fb8;">Kristiana.vjatere@gmail.com</a>
+        — или распечатайте, подпишите и принесите с собой в день регистрации
+        лагеря (<strong>Lāčplēša iela 117, Rīga</strong>) — или передайте раньше
+        координатору.
       </p>
       <p style="margin:0 0 12px;">
         Если есть вопросы — звоните координатору лагеря
@@ -109,7 +112,7 @@ export async function sendConfirmationEmail({ registration }: SendArgs) {
     `1. Informācijas lapa vecākiem — общая информация о лагере\n` +
     `2. Līgums — договор на участие (часть полей предзаполнена)\n` +
     `3. Pielikumi — анкета участника + правила лагеря\n\n` +
-    `Распечатайте, подпишите и принесите с собой в день регистрации лагеря (Lāčplēša iela 117, Rīga).\n\n` +
+    `Подпишите электронно и пришлите на Kristiana.vjatere@gmail.com — или распечатайте, подпишите и принесите с собой в день регистрации лагеря (Lāčplēša iela 117, Rīga), или передайте раньше координатору.\n\n` +
     `Координатор: Эсфирь · +371 27626010.\n`;
 
   const info = await transporter.sendMail({
