@@ -222,7 +222,12 @@ export async function fillContractPdf(
   //   (personas kods)         — underline x≈285-380 (skip)
   //   (dzīvesvietas adrese)   — underline x≈390-560
   drawAt(p1, font, reg.parentName, 50, 718, 10, 220);
-  drawAt(p1, font, reg.declaredAddress || "", 425, 718, 9, 145);
+  // Address blank runs to the right edge of the page; allow ~165pt and fall
+  // back to a slightly smaller font for the few addresses that need more.
+  const addr = reg.declaredAddress || "";
+  const addrWidth = font.widthOfTextAtSize(addr, 9);
+  const addrSize = addrWidth > 165 ? 8 : 9;
+  drawAt(p1, font, addr, 425, 718, addrSize, 165);
 
   // Section 1.1 — underline at y=551, labels at y=540.
   drawAt(p1, font, reg.childName, 50, 553, 10, 230);
