@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendApprovalEmail } from "@/lib/email/send-confirmation";
+
+// nodemailer needs Node — not Edge-friendly.
+export const runtime = "nodejs";
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -43,6 +47,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const body = await request.json();
   const { status, internalNotes, teamId } = body;
 
+  // Load current state so we can detect a NEW transition to "Подтверждена"
+  // and skip emailing when the status is just being re-saved unchanged.
+  const existing = await prisma.registration.findUnique({
+    where: { id: params.id },
+  });
+  if (!existing)
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   const data: any = {};
   if (status !== undefined) data.status = status;
   if (internalNotes !== undefined) data.internalNotes = internalNotes;
@@ -52,6 +64,34 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     where: { id: params.id },
     data,
   });
+
+  // Fire approval email when the status flips TO "Подтверждена". Failure is
+  // swallowed so an SMTP hiccup never undoes the admin's status change.
+  if (
+    status === "Подтверждена" &&
+    existing.status !== "Подтверждена" &&
+    registration.parentEmail
+  ) {
+    try {
+      await sendApprovalEmail({
+        registration: {
+          camp: registration.camp,
+          parentEmail: registration.parentEmail,
+          parentName: registration.parentName,
+          parentPhone: registration.parentPhone,
+          childName: registration.childName,
+          childDOB: registration.childDOB,
+          childPersonalId: registration.childPersonalId,
+          paymentMethod: registration.paymentMethod || "",
+        },
+      });
+    } catch (err) {
+      console.error(
+        "[admin patch] approval email failed (status update kept):",
+        err
+      );
+    }
+  }
 
   return NextResponse.json(registration);
 }
