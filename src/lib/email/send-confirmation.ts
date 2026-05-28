@@ -189,7 +189,7 @@ export async function sendApprovalEmail({ registration }: SendArgs) {
       <p style="margin:0 0 12px;"><strong>Во вложениях три документа:</strong></p>
       <ol style="margin:0 0 18px;padding-left:20px;">
         <li><strong>Informācijas lapa vecākiem</strong> — общая информация о лагере, что взять с собой, контакты.</li>
-        <li><strong>Līgums</strong> — договор на участие (часть полей предзаполнена; родителю остаётся вписать personas kods и подписать).</li>
+        <li><strong>Līgums</strong> — договор на участие (часть полей предзаполнена; родителю остаётся вписать personas kods и подписать). <strong>Нужно 2 экземпляра</strong> — по одному для каждой стороны.</li>
         <li><strong>Pielikumi</strong> — анкета участника (предзаполнена) и правила лагеря.</li>
       </ol>
 
@@ -228,7 +228,7 @@ export async function sendApprovalEmail({ registration }: SendArgs) {
     `Смена: ${campLabel}\n\n` +
     `Во вложениях три документа:\n` +
     `1. Informācijas lapa vecākiem — общая информация о лагере\n` +
-    `2. Līgums — договор на участие (часть полей предзаполнена)\n` +
+    `2. Līgums — договор на участие (часть полей предзаполнена). Нужно 2 экземпляра — по одному для каждой стороны.\n` +
     `3. Pielikumi — анкета участника + правила лагеря\n\n` +
     `Что нужно сделать до начала лагеря:\n` +
     `1. Подпишите Līgums и Pielikumi (электронно или от руки) и пришлите на Kristiana.vjatere@gmail.com — или принесите распечатки в день регистрации лагеря.\n` +
