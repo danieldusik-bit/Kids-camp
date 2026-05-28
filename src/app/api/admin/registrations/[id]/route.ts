@@ -73,6 +73,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     registration.parentEmail
   ) {
     try {
+      // Pass the full row so PDF generation can pre-fill all child/parent
+      // fields (declared address, pickup contacts, health answers, etc.).
       await sendApprovalEmail({
         registration: {
           camp: registration.camp,
@@ -82,6 +84,27 @@ export async function PATCH(request: Request, { params }: { params: { id: string
           childName: registration.childName,
           childDOB: registration.childDOB,
           childPersonalId: registration.childPersonalId,
+          childGender: registration.childGender,
+          declaredAddress: registration.declaredAddress,
+          actualAddress: registration.actualAddress,
+          pickup1Name: registration.pickup1Name,
+          pickup1Phone: registration.pickup1Phone,
+          pickup1Relation: registration.pickup1Relation,
+          pickup2Name: registration.pickup2Name,
+          pickup2Phone: registration.pickup2Phone,
+          pickup2Relation: registration.pickup2Relation,
+          hasAllergies: registration.hasAllergies,
+          allergiesDetails: registration.allergiesDetails,
+          hasChronicIllness: registration.hasChronicIllness,
+          chronicDetails: registration.chronicDetails,
+          takesMedication: registration.takesMedication,
+          medicationDetails: registration.medicationDetails,
+          hasSpecialTraits: registration.hasSpecialTraits,
+          specialTraitsDetails: registration.specialTraitsDetails,
+          hasEncephalitisVaccine: registration.hasEncephalitisVaccine,
+          participatedOtherCamps: registration.participatedOtherCamps,
+          swimmingAbility: registration.swimmingAbility,
+          additionalInfo: registration.additionalInfo,
           paymentMethod: registration.paymentMethod || "",
         },
       });

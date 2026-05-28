@@ -63,45 +63,30 @@ export async function sendConfirmationEmail({ registration }: SendArgs) {
     auth: { user, pass: pass.replace(/\s+/g, "") }, // strip spaces from app pwd
   });
 
-  // Generate the 3 PDFs in parallel.
-  const [infoSheet, contract, annexes] = await Promise.all([
-    getInfoSheetPdf(),
-    fillContractPdf(registration),
-    fillAnnexesPdf(registration),
-  ]);
-
   const childName = registration.childName || "ребёнок";
   const campLabel = CAMP_LABEL[registration.camp] || registration.camp;
 
+  // Submit email — short acknowledgement only. Documents go out separately
+  // once an admin approves the registration.
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;color:#2c2a26;line-height:1.55;">
-      <h2 style="margin:0 0 12px;font-size:22px;color:#1f1d18;">Заявка принята</h2>
+      <h2 style="margin:0 0 12px;font-size:22px;color:#1f1d18;">Заявка получена</h2>
       <p style="margin:0 0 16px;">
-        Здравствуйте! Спасибо, что зарегистрировали <strong>${escapeHtml(
-          childName
-        )}</strong> в лагерь. Мы получили вашу заявку.
+        Здравствуйте! Спасибо, что зарегистрировали
+        <strong>${escapeHtml(childName)}</strong> в лагерь. Мы получили вашу
+        заявку, она находится в обработке.
       </p>
       <div style="background:#f6efe0;border:1px solid #e3ddcd;border-radius:10px;padding:14px 16px;margin:0 0 18px;">
         <div style="font-size:13px;color:#8b867a;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Смена</div>
-        <div style="font-size:15px;margin-top:4px;">${escapeHtml(
-          campLabel
-        )}</div>
+        <div style="font-size:15px;margin-top:4px;">${escapeHtml(campLabel)}</div>
       </div>
-      <p style="margin:0 0 12px;"><strong>Во вложениях три документа:</strong></p>
-      <ol style="margin:0 0 18px;padding-left:20px;">
-        <li><strong>Informācijas lapa vecākiem</strong> — общая информация о лагере, что взять с собой, контакты.</li>
-        <li><strong>Līgums</strong> — договор на участие (часть полей уже заполнена; родителю остаётся вписать personas kods и подписать).</li>
-        <li><strong>Pielikumi</strong> — анкета участника (предзаполнена) и правила лагеря.</li>
-      </ol>
       <p style="margin:0 0 12px;">
-        Подпишите электронно и пришлите на
-        <a href="mailto:Kristiana.vjatere@gmail.com" style="color:#1f5fb8;">Kristiana.vjatere@gmail.com</a>
-        — или распечатайте, подпишите и принесите с собой в день регистрации
-        лагеря (<strong>Lāčplēša iela 117, Rīga</strong>) — или передайте раньше
-        координатору.
+        После подтверждения мы пришлём вам отдельным письмом
+        <strong>3 документа</strong> — договор и приложения для подписи.
+        Пожалуйста, дождитесь этого письма перед тем как что-либо подписывать.
       </p>
       <p style="margin:0 0 12px;">
-        Если есть вопросы — звоните координатору лагеря
+        Если возникнут вопросы — звоните координатору лагеря
         <strong>Эсфирь · +371 27626010</strong> или ответьте на это письмо.
       </p>
       <p style="margin:18px 0 0;font-size:13px;color:#8b867a;">
@@ -112,39 +97,18 @@ export async function sendConfirmationEmail({ registration }: SendArgs) {
 
   const text =
     `Здравствуйте!\n\n` +
-    `Спасибо, что зарегистрировали ${childName} в лагерь.\n` +
+    `Спасибо, что зарегистрировали ${childName} в лагерь. Мы получили вашу заявку, она находится в обработке.\n` +
     `Смена: ${campLabel}\n\n` +
-    `Во вложениях три документа:\n` +
-    `1. Informācijas lapa vecākiem — общая информация о лагере\n` +
-    `2. Līgums — договор на участие (часть полей предзаполнена)\n` +
-    `3. Pielikumi — анкета участника + правила лагеря\n\n` +
-    `Подпишите электронно и пришлите на Kristiana.vjatere@gmail.com — или распечатайте, подпишите и принесите с собой в день регистрации лагеря (Lāčplēša iela 117, Rīga), или передайте раньше координатору.\n\n` +
+    `После подтверждения мы пришлём вам отдельным письмом 3 документа (договор и приложения) для подписи. Пожалуйста, дождитесь этого письма перед тем как что-либо подписывать.\n\n` +
     `Координатор: Эсфирь · +371 27626010.\n`;
 
   const info = await transporter.sendMail({
     from: { name: FROM_NAME, address: user },
     to: registration.parentEmail,
     replyTo: user,
-    subject: `Заявка в лагерь принята — ${childName}`,
+    subject: `Заявка в лагерь получена — ${childName}`,
     text,
     html,
-    attachments: [
-      {
-        filename: "Informacijas-lapa-vecakiem-2026.pdf",
-        content: Buffer.from(infoSheet),
-        contentType: "application/pdf",
-      },
-      {
-        filename: `Ligums-${slugify(childName)}-2026.pdf`,
-        content: Buffer.from(contract),
-        contentType: "application/pdf",
-      },
-      {
-        filename: `Pielikumi-${slugify(childName)}-2026.pdf`,
-        content: Buffer.from(annexes),
-        contentType: "application/pdf",
-      },
-    ],
   });
 
   return { skipped: false, messageId: info.messageId };
@@ -181,6 +145,14 @@ export async function sendApprovalEmail({ registration }: SendArgs) {
     auth: { user, pass: pass.replace(/\s+/g, "") },
   });
 
+  // Generate the 3 PDFs in parallel (info sheet is static; the other two are
+  // overlaid with this registration's data).
+  const [infoSheet, contract, annexes] = await Promise.all([
+    getInfoSheetPdf(),
+    fillContractPdf(registration),
+    fillAnnexesPdf(registration),
+  ]);
+
   const childName = registration.childName || "ребёнок";
   const campLabel = CAMP_LABEL[registration.camp] || registration.camp;
   const meeting = CAMP_MEETING[registration.camp] || "";
@@ -214,13 +186,20 @@ export async function sendApprovalEmail({ registration }: SendArgs) {
         <div style="font-size:15px;margin-top:4px;color:#15693a;">${escapeHtml(campLabel)}</div>
       </div>
 
+      <p style="margin:0 0 12px;"><strong>Во вложениях три документа:</strong></p>
+      <ol style="margin:0 0 18px;padding-left:20px;">
+        <li><strong>Informācijas lapa vecākiem</strong> — общая информация о лагере, что взять с собой, контакты.</li>
+        <li><strong>Līgums</strong> — договор на участие (часть полей предзаполнена; родителю остаётся вписать personas kods и подписать).</li>
+        <li><strong>Pielikumi</strong> — анкета участника (предзаполнена) и правила лагеря.</li>
+      </ol>
+
       <p style="margin:0 0 12px;font-weight:600;">Что нужно сделать до начала лагеря:</p>
       <ol style="margin:0 0 18px;padding-left:20px;">
         <li style="margin-bottom:8px;">
-          Если ещё не отправили подписанный <strong>Līgums</strong> и
-          <strong>Pielikumi</strong> — подпишите их (электронно или от руки)
-          и пришлите на
-          <a href="mailto:Kristiana.vjatere@gmail.com" style="color:#1f5fb8;">Kristiana.vjatere@gmail.com</a>.
+          Подпишите <strong>Līgums</strong> и <strong>Pielikumi</strong>
+          (электронно или от руки) и пришлите на
+          <a href="mailto:Kristiana.vjatere@gmail.com" style="color:#1f5fb8;">Kristiana.vjatere@gmail.com</a>
+          — или принесите распечатки в день регистрации лагеря.
         </li>
         <li style="margin-bottom:8px;">
           Произведите оплату согласно выбранному способу (см. ниже).
@@ -247,8 +226,12 @@ export async function sendApprovalEmail({ registration }: SendArgs) {
     `Здравствуйте!\n\n` +
     `Заявка ${childName} в лагерь подтверждена. Место за вашим ребёнком закреплено.\n` +
     `Смена: ${campLabel}\n\n` +
+    `Во вложениях три документа:\n` +
+    `1. Informācijas lapa vecākiem — общая информация о лагере\n` +
+    `2. Līgums — договор на участие (часть полей предзаполнена)\n` +
+    `3. Pielikumi — анкета участника + правила лагеря\n\n` +
     `Что нужно сделать до начала лагеря:\n` +
-    `1. Если ещё не отправили подписанный Līgums и Pielikumi — подпишите их (электронно или от руки) и пришлите на Kristiana.vjatere@gmail.com.\n` +
+    `1. Подпишите Līgums и Pielikumi (электронно или от руки) и пришлите на Kristiana.vjatere@gmail.com — или принесите распечатки в день регистрации лагеря.\n` +
     `2. Произведите оплату согласно выбранному способу.\n` +
     (meeting ? `3. Приходите на регистрацию: ${meeting}.\n` : "") +
     `\n` +
@@ -266,6 +249,23 @@ export async function sendApprovalEmail({ registration }: SendArgs) {
     subject: `Заявка одобрена — ${childName}`,
     text,
     html,
+    attachments: [
+      {
+        filename: "Informacijas-lapa-vecakiem-2026.pdf",
+        content: Buffer.from(infoSheet),
+        contentType: "application/pdf",
+      },
+      {
+        filename: `Ligums-${slugify(childName)}-2026.pdf`,
+        content: Buffer.from(contract),
+        contentType: "application/pdf",
+      },
+      {
+        filename: `Pielikumi-${slugify(childName)}-2026.pdf`,
+        content: Buffer.from(annexes),
+        contentType: "application/pdf",
+      },
+    ],
   });
 
   return { skipped: false, messageId: info.messageId };
