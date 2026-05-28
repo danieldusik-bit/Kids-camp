@@ -45,7 +45,6 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   const body = await request.json();
-  const { status, internalNotes, teamId } = body;
 
   // Load current state so we can detect a NEW transition to "Подтверждена"
   // and skip emailing when the status is just being re-saved unchanged.
@@ -55,10 +54,67 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (!existing)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const data: any = {};
-  if (status !== undefined) data.status = status;
-  if (internalNotes !== undefined) data.internalNotes = internalNotes;
-  if (teamId !== undefined) data.teamId = teamId || null;
+  // Whitelist of admin-editable fields. Any other field on the request body
+  // is silently ignored.
+  const ADMIN_EDITABLE = [
+    "status",
+    "internalNotes",
+    "camp",
+    "groupWith",
+    "childName",
+    "childDOB",
+    "childAge",
+    "childPersonalId",
+    "childGender",
+    "childLanguage",
+    "city",
+    "declaredAddress",
+    "actualAddress",
+    "parentName",
+    "parentPhone",
+    "parentEmail",
+    "emergencyContactName",
+    "emergencyContactPhone",
+    "pickup1Name",
+    "pickup1Phone",
+    "pickup1Relation",
+    "pickup2Name",
+    "pickup2Phone",
+    "pickup2Relation",
+    "hasAllergies",
+    "allergiesDetails",
+    "hasChronicIllness",
+    "chronicDetails",
+    "takesMedication",
+    "medicationDetails",
+    "hasSpecialTraits",
+    "specialTraitsDetails",
+    "hasEncephalitisVaccine",
+    "participatedOtherCamps",
+    "swimmingAbility",
+    "physicalActivity",
+    "physicalLimitations",
+    "dietRestrictions",
+    "dietDetails",
+    "additionalInfo",
+    "hearAboutUs",
+    "paymentMethod",
+  ] as const;
+
+  const data: Record<string, unknown> = {};
+  for (const k of ADMIN_EDITABLE) {
+    if (body[k] !== undefined) data[k] = body[k];
+  }
+  // teamId is separate — null vs undefined matters (null = unassign)
+  if (body.teamId !== undefined) data.teamId = body.teamId || null;
+
+  // childAge is an Int — coerce if it came in as a string from a form input
+  if (typeof data.childAge === "string") {
+    const n = parseInt(data.childAge, 10);
+    data.childAge = Number.isFinite(n) ? n : 0;
+  }
+
+  const status = body.status as string | undefined;
 
   const registration = await prisma.registration.update({
     where: { id: params.id },
