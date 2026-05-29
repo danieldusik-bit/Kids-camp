@@ -227,7 +227,13 @@ export default function RegistrationModal({
     onClose();
   }
 
-  // EField wrapper bound to this modal's edit-mode + draft state.
+  // Render helper for an editable field, bound to this modal's edit-mode +
+  // draft state. IMPORTANT: call it as a function — {EF({ ... })} — never as a
+  // JSX element <EF .../>. Rendered as a JSX element it would be a brand-new
+  // component *type* on every render, so React would unmount/remount the
+  // underlying <input> and drop focus after every keystroke. Called as a
+  // function it simply returns a stable module-scope <EditableField/> element,
+  // which React reconciles in place — focus is preserved while typing.
   function EF<K extends keyof Registration>(props: {
     label: string;
     k: K;
@@ -360,107 +366,101 @@ export default function RegistrationModal({
 
               <SubHeading>Лагерь</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF
-                  label="Смена"
-                  k="camp"
-                  options={[
+                {EF({
+                  label: "Смена",
+                  k: "camp",
+                  options: [
                     { value: "kids", label: "Детский (28.06 – 4.07)" },
                     { value: "teens", label: "Подростковый (26.07 – 1.08)" },
-                  ]}
-                  display={CAMP_LABEL[edited.camp || ""] || edited.camp || "—"}
-                />
-                <EF label="В одной группе с" k="groupWith" />
+                  ],
+                  display: CAMP_LABEL[edited.camp || ""] || edited.camp || "—",
+                })}
+                {EF({ label: "В одной группе с", k: "groupWith" })}
               </div>
 
               <SubHeading>Ребёнок</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF label="Имя и фамилия" k="childName" />
-                <EF
-                  label="Пол"
-                  k="childGender"
-                  options={[
+                {EF({ label: "Имя и фамилия", k: "childName" })}
+                {EF({
+                  label: "Пол",
+                  k: "childGender",
+                  options: [
                     { value: "", label: "—" },
                     { value: "Мальчик", label: "Мальчик" },
                     { value: "Девочка", label: "Девочка" },
-                  ]}
-                />
-                <EF label="Дата рождения" k="childDOB" type="date" />
-                <EF label="Возраст" k="childAge" type="number" />
-                <EF label="Personas kods" k="childPersonalId" />
-                <EF
-                  label="Язык общения"
-                  k="childLanguage"
-                  options={[
+                  ],
+                })}
+                {EF({ label: "Дата рождения", k: "childDOB", type: "date" })}
+                {EF({ label: "Возраст", k: "childAge", type: "number" })}
+                {EF({ label: "Personas kods", k: "childPersonalId" })}
+                {EF({
+                  label: "Язык общения",
+                  k: "childLanguage",
+                  options: [
                     { value: "Русский", label: "Русский" },
                     { value: "Latviešu", label: "Latviešu" },
                     { value: "English", label: "English" },
-                  ]}
-                />
-                <EF label="Город" k="city" />
-                <EF
-                  label="Декларированный адрес"
-                  k="declaredAddress"
-                  textarea
-                  rows={2}
-                />
-                <EF
-                  label="Фактический адрес"
-                  k="actualAddress"
-                  textarea
-                  rows={2}
-                  display={
-                    edited.actualAddress
-                      ? edited.actualAddress === edited.declaredAddress
-                        ? "= декларированный"
-                        : edited.actualAddress
-                      : "—"
-                  }
-                />
+                  ],
+                })}
+                {EF({ label: "Город", k: "city" })}
+                {EF({
+                  label: "Декларированный адрес",
+                  k: "declaredAddress",
+                  textarea: true,
+                  rows: 2,
+                })}
+                {EF({
+                  label: "Фактический адрес",
+                  k: "actualAddress",
+                  textarea: true,
+                  rows: 2,
+                  display: edited.actualAddress
+                    ? edited.actualAddress === edited.declaredAddress
+                      ? "= декларированный"
+                      : edited.actualAddress
+                    : "—",
+                })}
               </div>
 
               <SubHeading>Родитель / Опекун</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF label="Имя и фамилия" k="parentName" />
-                <EF
-                  label="Телефон"
-                  k="parentPhone"
-                  type="tel"
-                  display={
-                    edited.parentPhone ? (
-                      <a
-                        href={`tel:+371${edited.parentPhone}`}
-                        className="text-blue-600 hover:underline"
-                      >
-                        +371 {edited.parentPhone}
-                      </a>
-                    ) : (
-                      "—"
-                    )
-                  }
-                />
-                <EF
-                  label="Email"
-                  k="parentEmail"
-                  type="email"
-                  display={
-                    edited.parentEmail ? (
-                      <a
-                        href={`mailto:${edited.parentEmail}`}
-                        className="text-blue-600 hover:underline break-all"
-                      >
-                        {edited.parentEmail}
-                      </a>
-                    ) : (
-                      "—"
-                    )
-                  }
-                />
-                <EF label="Экстренный контакт" k="emergencyContactName" />
-                <EF
-                  label="Телефон экстренного"
-                  k="emergencyContactPhone"
-                  type="tel"
-                />
+                {EF({ label: "Имя и фамилия", k: "parentName" })}
+                {EF({
+                  label: "Телефон",
+                  k: "parentPhone",
+                  type: "tel",
+                  display: edited.parentPhone ? (
+                    <a
+                      href={`tel:+371${edited.parentPhone}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      +371 {edited.parentPhone}
+                    </a>
+                  ) : (
+                    "—"
+                  ),
+                })}
+                {EF({
+                  label: "Email",
+                  k: "parentEmail",
+                  type: "email",
+                  display: edited.parentEmail ? (
+                    <a
+                      href={`mailto:${edited.parentEmail}`}
+                      className="text-blue-600 hover:underline break-all"
+                    >
+                      {edited.parentEmail}
+                    </a>
+                  ) : (
+                    "—"
+                  ),
+                })}
+                {EF({ label: "Экстренный контакт", k: "emergencyContactName" })}
+                {EF({
+                  label: "Телефон экстренного",
+                  k: "emergencyContactPhone",
+                  type: "tel",
+                })}
               </div>
 
               {(reg.billingName ||
@@ -489,12 +489,12 @@ export default function RegistrationModal({
 
               <SubHeading>Забор из лагеря</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF label="Контакт #1: имя" k="pickup1Name" />
-                <EF label="Контакт #1: телефон" k="pickup1Phone" type="tel" />
-                <EF label="Контакт #1: кем" k="pickup1Relation" />
-                <EF label="Контакт #2: имя" k="pickup2Name" />
-                <EF label="Контакт #2: телефон" k="pickup2Phone" type="tel" />
-                <EF label="Контакт #2: кем" k="pickup2Relation" />
+                {EF({ label: "Контакт #1: имя", k: "pickup1Name" })}
+                {EF({ label: "Контакт #1: телефон", k: "pickup1Phone", type: "tel" })}
+                {EF({ label: "Контакт #1: кем", k: "pickup1Relation" })}
+                {EF({ label: "Контакт #2: имя", k: "pickup2Name" })}
+                {EF({ label: "Контакт #2: телефон", k: "pickup2Phone", type: "tel" })}
+                {EF({ label: "Контакт #2: кем", k: "pickup2Relation" })}
                 {reg.pickupAuthorized && (
                   <div className="md:col-span-2">
                     <Field
@@ -507,132 +507,123 @@ export default function RegistrationModal({
 
               <SubHeading>Здоровье</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF
-                  label="Аллергии"
-                  k="hasAllergies"
-                  options={boolOpts}
-                  display={
-                    edited.hasAllergies
-                      ? `Да${
-                          edited.allergiesDetails
-                            ? " — " + edited.allergiesDetails
-                            : ""
-                        }`
-                      : "Нет"
-                  }
-                />
-                <EF
-                  label="Аллергии: детали"
-                  k="allergiesDetails"
-                  textarea
-                  rows={2}
-                />
-                <EF
-                  label="Хронические заболевания"
-                  k="hasChronicIllness"
-                  options={boolOpts}
-                  display={
-                    edited.hasChronicIllness
-                      ? `Да${
-                          edited.chronicDetails
-                            ? " — " + edited.chronicDetails
-                            : ""
-                        }`
-                      : "Нет"
-                  }
-                />
-                <EF
-                  label="Хронические: детали"
-                  k="chronicDetails"
-                  textarea
-                  rows={2}
-                />
-                <EF
-                  label="Медикаменты"
-                  k="takesMedication"
-                  options={boolOpts}
-                  display={
-                    edited.takesMedication
-                      ? `Да${
-                          edited.medicationDetails
-                            ? " — " + edited.medicationDetails
-                            : ""
-                        }`
-                      : "Нет"
-                  }
-                />
-                <EF
-                  label="Медикаменты: детали"
-                  k="medicationDetails"
-                  textarea
-                  rows={2}
-                />
-                <EF
-                  label="Особенности характера / психики"
-                  k="hasSpecialTraits"
-                  options={boolOpts}
-                  display={
-                    edited.hasSpecialTraits
-                      ? `Да${
-                          edited.specialTraitsDetails
-                            ? " — " + edited.specialTraitsDetails
-                            : ""
-                        }`
-                      : "Нет"
-                  }
-                />
-                <EF
-                  label="Особенности: детали"
-                  k="specialTraitsDetails"
-                  textarea
-                  rows={2}
-                />
-                <EF
-                  label="Прививка от энцефалита"
-                  k="hasEncephalitisVaccine"
-                  options={yesNoOpts}
-                  display={yesNoLabel(edited.hasEncephalitisVaccine)}
-                />
-                <EF
-                  label="Был в других лагерях"
-                  k="participatedOtherCamps"
-                  options={yesNoOpts}
-                  display={yesNoLabel(edited.participatedOtherCamps)}
-                />
-                <EF
-                  label="Умеет плавать"
-                  k="swimmingAbility"
-                  options={[
+                {EF({
+                  label: "Аллергии",
+                  k: "hasAllergies",
+                  options: boolOpts,
+                  display: edited.hasAllergies
+                    ? `Да${
+                        edited.allergiesDetails
+                          ? " — " + edited.allergiesDetails
+                          : ""
+                      }`
+                    : "Нет",
+                })}
+                {EF({
+                  label: "Аллергии: детали",
+                  k: "allergiesDetails",
+                  textarea: true,
+                  rows: 2,
+                })}
+                {EF({
+                  label: "Хронические заболевания",
+                  k: "hasChronicIllness",
+                  options: boolOpts,
+                  display: edited.hasChronicIllness
+                    ? `Да${
+                        edited.chronicDetails
+                          ? " — " + edited.chronicDetails
+                          : ""
+                      }`
+                    : "Нет",
+                })}
+                {EF({
+                  label: "Хронические: детали",
+                  k: "chronicDetails",
+                  textarea: true,
+                  rows: 2,
+                })}
+                {EF({
+                  label: "Медикаменты",
+                  k: "takesMedication",
+                  options: boolOpts,
+                  display: edited.takesMedication
+                    ? `Да${
+                        edited.medicationDetails
+                          ? " — " + edited.medicationDetails
+                          : ""
+                      }`
+                    : "Нет",
+                })}
+                {EF({
+                  label: "Медикаменты: детали",
+                  k: "medicationDetails",
+                  textarea: true,
+                  rows: 2,
+                })}
+                {EF({
+                  label: "Особенности характера / психики",
+                  k: "hasSpecialTraits",
+                  options: boolOpts,
+                  display: edited.hasSpecialTraits
+                    ? `Да${
+                        edited.specialTraitsDetails
+                          ? " — " + edited.specialTraitsDetails
+                          : ""
+                      }`
+                    : "Нет",
+                })}
+                {EF({
+                  label: "Особенности: детали",
+                  k: "specialTraitsDetails",
+                  textarea: true,
+                  rows: 2,
+                })}
+                {EF({
+                  label: "Прививка от энцефалита",
+                  k: "hasEncephalitisVaccine",
+                  options: yesNoOpts,
+                  display: yesNoLabel(edited.hasEncephalitisVaccine),
+                })}
+                {EF({
+                  label: "Был в других лагерях",
+                  k: "participatedOtherCamps",
+                  options: yesNoOpts,
+                  display: yesNoLabel(edited.participatedOtherCamps),
+                })}
+                {EF({
+                  label: "Умеет плавать",
+                  k: "swimmingAbility",
+                  options: [
                     { value: "", label: "—" },
                     { value: "yes", label: "Да, умеет" },
                     { value: "weak", label: "Умеет, но плохо" },
                     { value: "no", label: "Нет, не умеет" },
-                  ]}
-                  display={swimmingLabel(edited.swimmingAbility)}
-                />
-                <EF
-                  label="Физическая активность"
-                  k="physicalActivity"
-                  options={[
+                  ],
+                  display: swimmingLabel(edited.swimmingAbility),
+                })}
+                {EF({
+                  label: "Физическая активность",
+                  k: "physicalActivity",
+                  options: [
                     { value: "Разрешено", label: "Без ограничений" },
                     { value: "С ограничениями", label: "С ограничениями" },
-                  ]}
-                  display={
+                  ],
+                  display:
                     edited.physicalActivity === "С ограничениями"
                       ? `С ограничениями${
                           edited.physicalLimitations
                             ? " — " + edited.physicalLimitations
                             : ""
                         }`
-                      : edited.physicalActivity || "—"
-                  }
-                />
-                <EF
-                  label="Физ. ограничения: детали"
-                  k="physicalLimitations"
-                  textarea
-                  rows={2}
-                />
+                      : edited.physicalActivity || "—",
+                })}
+                {EF({
+                  label: "Физ. ограничения: детали",
+                  k: "physicalLimitations",
+                  textarea: true,
+                  rows: 2,
+                })}
                 {reg.healthInfo && !editMode && (
                   <div className="md:col-span-2">
                     <Field
@@ -645,45 +636,44 @@ export default function RegistrationModal({
 
               <SubHeading>Питание</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF
-                  label="Ограничения"
-                  k="dietRestrictions"
-                  options={[
+                {EF({
+                  label: "Ограничения",
+                  k: "dietRestrictions",
+                  options: [
                     { value: "нет", label: "Нет" },
                     { value: "вегетарианское", label: "Вегетарианец" },
                     { value: "веганское", label: "Веган" },
                     { value: "другое", label: "Другое" },
-                  ]}
-                  display={
+                  ],
+                  display:
                     edited.dietRestrictions === "другое"
                       ? `Другое${
                           edited.dietDetails ? " — " + edited.dietDetails : ""
                         }`
-                      : edited.dietRestrictions || "—"
-                  }
-                />
-                <EF label="Питание: детали" k="dietDetails" />
+                      : edited.dietRestrictions || "—",
+                })}
+                {EF({ label: "Питание: детали", k: "dietDetails" })}
               </div>
 
               <SubHeading>Дополнительно</SubHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EF
-                  label="Способ оплаты"
-                  k="paymentMethod"
-                  options={[
+                {EF({
+                  label: "Способ оплаты",
+                  k: "paymentMethod",
+                  options: [
                     { value: "", label: "—" },
                     { value: "cash", label: "Наличными" },
                     { value: "stripe", label: "Картой (Stripe)" },
-                  ]}
-                  display={paymentMethodLabel(edited.paymentMethod)}
-                />
-                <EF
-                  label="Дополнительная информация"
-                  k="additionalInfo"
-                  textarea
-                  rows={2}
-                />
-                <EF label="Откуда узнали" k="hearAboutUs" />
+                  ],
+                  display: paymentMethodLabel(edited.paymentMethod),
+                })}
+                {EF({
+                  label: "Дополнительная информация",
+                  k: "additionalInfo",
+                  textarea: true,
+                  rows: 2,
+                })}
+                {EF({ label: "Откуда узнали", k: "hearAboutUs" })}
               </div>
 
               {/* Management */}
