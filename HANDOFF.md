@@ -116,7 +116,10 @@ npm run dev          # http://localhost:3000
 - Node `v24.14.0` (any modern Node ≥20 works)
 - npm `11.x`
 - Turso CLI `v1.0.20` (only needed for production DB ops — see §6)
-- Vercel CLI (installed via plugin, called as `npx vercel`)
+- Vercel CLI `v51.2.1`, installed globally at `/usr/local/bin/vercel`
+  - ⚠️ Call it as **`vercel …`** (or the full path), **NOT `npx vercel`** —
+    in this repo `npx vercel` collides with an npm script lookup and fails
+    with `Missing script: "vercel"`.
 
 ---
 
@@ -126,7 +129,7 @@ npm run dev          # http://localhost:3000
 git add -A
 git commit -m "your message"
 git push                                # → triggers Vercel preview
-npx vercel deploy --prod                # promote to production
+vercel deploy --prod                    # promote to production (NOT `npx vercel`)
 ```
 
 Live URL: **https://kids-camp-portal.vercel.app**
@@ -200,11 +203,11 @@ DATABASE_URL="file:dev.db" npx prisma db push
 DATABASE_URL="file:dev.db" npx prisma db seed
 
 # Pull Vercel env into a local file (review only)
-npx vercel env pull .env.vercel
+vercel env pull .env.vercel
 
-# Deploy and tail
-npx vercel deploy --prod
-npx vercel logs https://kids-camp-portal.vercel.app --follow
+# Deploy and tail  (use `vercel`, NOT `npx vercel` — see §3)
+vercel deploy --prod
+vercel logs https://kids-camp-portal.vercel.app --follow
 ```
 
 ---
@@ -251,30 +254,101 @@ Read HANDOFF.md and the latest 5 commits, then summarize where we left off.
 
 ---
 
-## 9. Most recent state (as of this handoff)
+## 9. Most recent state (as of 2026-05-29)
 
-Last commit: **`0edcde6`** — *Mobile responsive admin panel + slide-out
-sidebar drawer*.
+Last commit: **`61174e7`** — *Admin modal: fix input focus loss when editing
+fields*. Working tree clean; everything below is **deployed to production**.
 
-What works end-to-end:
+### ✅ Just fixed & shipped — edit-mode input focus loss
 
-- Public form (6 steps, two-camp choice, latviešu name placeholders, summary
-  step with "Изменить" jump-back, success screen with mailto + reset)
-- Admin: dashboard with stats + recent table, all-registrations list,
-  per-camp pages with gender + age donut charts, Команды with drag-n-drop
-  + filterable unassigned table, Пользователи (SUPERADMIN)
-- MENTOR role limited to their teams' rosters; API enforces this
-- Mobile drawer + responsive admin layout
+The "edit every field" feature (commit `edf3cfd`) had a bug: in edit mode the
+input lost focus after **every** keystroke, forcing a re-click per character.
 
-### Known small things (next up if you want)
+- **Root cause:** the `EF<K>` editable-field helper was defined *inside*
+  `RegistrationModal` and rendered as a JSX element type (`<EF .../>`). Since
+  `EF` got a new function identity on every render, React saw each keystroke's
+  `<EF/>` as a *different component type*, unmounted/remounted the `<input>`,
+  and dropped focus — the classic "component defined during render" anti-pattern.
+- **Fix (commit `61174e7`):** call `EF` as a plain function — `{EF({ ... })}` —
+  at all 40 sites instead of `<EF .../>`. It now returns a stable module-scope
+  `<EditableField/>` element that React reconciles in place, so the input keeps
+  focus. Pure refactor: every field's label/key binding, the `EditableField`
+  renderer, `handleSave`, and `EDITABLE_KEYS` are **byte-identical** to before
+  (verified by diff). The `EF` definition in
+  [`RegistrationModal.tsx`](src/components/RegistrationModal.tsx) now carries a
+  comment warning never to use it as `<EF/>` again.
+- **Save was verified end-to-end** (local server, admin login, real PATCH):
+  text, `childAge` string→int coercion (`"12"`→`12`), booleans, `yes/no`
+  enums, payment method and address all round-trip correctly. Frontend
+  `EDITABLE_KEYS` ⟷ API `ADMIN_EDITABLE` whitelists are in sync (the only API
+  extras are `status` + `internalNotes`, which `handleSave` always sends).
+- **Not yet done:** an in-browser re-test by the user on the live site (the
+  automated local browser test was blocked by a sandbox `EPERM`; the fix is the
+  canonical one and build + save are verified). If focus *still* drops after a
+  hard refresh, look for any OTHER component defined inside `RegistrationModal`
+  render, or a changing `key` on an input — not the `EF` pattern, which is gone.
 
-- The "search" input in the admin topbar is decorative (disabled). It's
-  hidden on mobile already; on desktop it could be wired up to filter the
-  current page.
-- `/admin/registrations/[id]` standalone page is still rendered server-side;
-  the modal duplicates most of its layout. Could be unified later.
-- CSV export from `/admin/registrations/export` doesn't yet take a `?camp=`
-  filter (the camp pages build their CSV client-side).
+> Note: `HANDOFF.md` itself was **not** part of the `61174e7` deploy commit
+> (kept the deploy to just the functional fix per the user's request); this
+> doc update lands separately.
+
+---
+
+### What works end-to-end (everything below is live)
+
+- **Public form** (`/register`): multi-step wizard, two camps with full
+  descriptions on the camp-choice step, age ranges (kids 6–12, teens 13–18),
+  Latvian `Personas kods` (mobile shows full keyboard for the dash), declared
+  + actual address (checkbox to copy), mandatory 2 pickup contacts
+  (name/phone/relation), health questions incl. special traits / encephalitis
+  vaccine / other-camps / swimming ability, payment = **Stripe or cash**
+  (2-column on desktop, stacked on mobile; Stripe is *selected* on the form,
+  the pay button appears on the success screen — no mid-form navigation),
+  "add another child" pre-fills shared contacts/addresses. OG share preview
+  says "Лагеря 2026".
+- **Admin** (`/admin/*`): dashboard, all-registrations list, per-camp pages
+  with gender + age donuts that **toggle between confirmed-only and all**
+  applications, Команды drag-n-drop, Пользователи (SUPERADMIN). MENTOR limited
+  to their teams; API enforces it. Mobile drawer + responsive layout.
+- **Registration modal** ([`RegistrationModal.tsx`](src/components/RegistrationModal.tsx)):
+  full detail view + **edit-mode for all ~41 fields** (focus bug fixed in
+  `61174e7`), status change, internal notes, delete (SUPERADMIN).
+- **Emails** (Gmail SMTP via nodemailer — [`send-confirmation.ts`](src/lib/email/send-confirmation.ts)):
+  - On **submit** → short "Заявка получена, в обработке" acknowledgement,
+    **no attachments**.
+  - On **admin approval** (status → "Подтверждена") → "✓ Заявка одобрена"
+    **with 3 PDF attachments** (Informācijas lapa, Līgums — note "нужно 2
+    экземпляра", Pielikumi), payment-method-aware text, meeting details.
+  - Sender: `Kristiana.vjatere@gmail.com` (FROM name "Kristiāna Vjatere ·
+    Bērnu nometne 2026"). Creds in Vercel env `GMAIL_USER` /
+    `GMAIL_APP_PASSWORD` — already set in prod.
+- **PDF fill** ([`src/lib/pdf/fill-documents.ts`](src/lib/pdf/fill-documents.ts)):
+  pdf-lib + fontkit + DejaVu Sans overlay; coordinates extracted exactly from
+  the templates via pdfjs-dist; address auto-shrinks 9pt→8pt to avoid clipping.
+  User has confirmed these look good.
+- **Backups / durability** (the user is anxious about losing PII — a prior
+  Netlify app wiped data after 30 days): Turso has no such policy; plus a
+  GitHub Actions cron does a **weekly DB backup** and a **daily keepalive**.
+
+### ⚠️ Hard constraints (do not violate)
+
+- **Repo is PUBLIC** → never commit children's PII or DB dumps. `/tmp-backup/`
+  is gitignored; keep it that way.
+- Do **not** edit `src/generated/prisma/` (generated from the schema).
+- Do **not** commit `dev.db` / `*.db-journal` / `.env` (already gitignored).
+- Do **not** add a parent `Personas kods` field — the user explicitly said
+  it's not needed.
+- Turso schema changes: run `ALTER TABLE` against prod **and** update
+  `prisma/schema.prisma` + `npx prisma generate` so they stay in sync. If the
+  `turso` CLI session is expired, pull the token via
+  `vercel env pull /tmp/.env.vercel-temp --environment=production` and run the
+  ALTER through `@libsql/client`.
+
+### Older "nice-to-have" backlog (not blocking)
+
+- Admin topbar "search" input is decorative (disabled); could be wired up.
+- `/admin/registrations/[id]` standalone page duplicates the modal layout.
+- CSV export `/admin/registrations/export` doesn't take a `?camp=` filter yet.
 
 ---
 
