@@ -2,6 +2,7 @@
 import { Field } from "../fields/Field";
 import { Chips } from "../fields/Chips";
 import { Area } from "../fields/Area";
+import { Notice } from "../Notice";
 import type { useCampForm } from "@/lib/camp/useCampForm";
 import { CAMPS } from "@/lib/camp/camp";
 
@@ -37,6 +38,16 @@ export function StepChild({
           { value: "girl", label: "👧 Девочка" },
         ]}
       />
+
+      {data.childGender === "boy" && data.camp === "kids" && (
+        <Notice tone="warn" icon="⚠️">
+          К сожалению, места для <strong>мальчиков</strong> в детском лагере
+          закончились — регистрация мальчиков на эту смену сейчас закрыта, и
+          продолжить с этим выбором нельзя. Пожалуйста, свяжитесь с
+          координатором: Эсфирь&nbsp;·&nbsp;27626010 — мы сообщим, если место
+          освободится.
+        </Notice>
+      )}
 
       <Field
         id="childBirth"

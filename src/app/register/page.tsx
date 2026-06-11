@@ -56,10 +56,14 @@ export default function RegisterPage() {
     submitted,
     submitting,
     data,
+    boysKidsBlocked,
     resetAll,
     addAnotherChild,
   } = form;
   const isLast = stepIdx === STEPS.length - 1;
+  // Boys can't register for the kids camp — disable forward nav from the
+  // child step (index 2) onward until the camp or gender changes.
+  const blockForward = boysKidsBlocked && stepIdx >= 2;
   const head = HEADERS[stepIdx];
 
   return (
@@ -157,6 +161,7 @@ export default function RegisterPage() {
                   onNext={goNext}
                   onSubmit={submit}
                   submitting={submitting}
+                  nextDisabled={blockForward}
                 />
               </>
             )}

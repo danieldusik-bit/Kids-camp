@@ -1,6 +1,7 @@
 "use client";
 import { CAMPS, type CampId, type CampInfo } from "@/lib/camp/camp";
 import type { useCampForm } from "@/lib/camp/useCampForm";
+import { Notice } from "../Notice";
 
 export function StepCamp({
   form,
@@ -11,6 +12,12 @@ export function StepCamp({
   const selectedCamp = CAMPS.find((c) => c.id === data.camp) || null;
   return (
     <div className="animate-fadeUp flex flex-col gap-5">
+      <Notice tone="info" icon="📝">
+        Пожалуйста, заполняйте всю анкету на латышском языке{" "}
+        <strong>(Latviešu valodā)</strong> — имена, фамилии и адреса должны
+        совпадать с официальными документами и договором (Līgums).
+      </Notice>
+
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-3">
         {CAMPS.map((c) => {
           const on = data.camp === c.id;
@@ -83,6 +90,14 @@ export function StepCamp({
           );
         })}
       </div>
+
+      {data.camp === "kids" && (
+        <Notice tone="warn" icon="⚠️">
+          Обратите внимание: места для <strong>мальчиков</strong> в детском
+          лагере уже закончились. Для девочек места ещё есть. По вопросам —
+          Эсфирь&nbsp;·&nbsp;27626010.
+        </Notice>
+      )}
 
       {selectedCamp && <CampDescription camp={selectedCamp} />}
     </div>

@@ -241,15 +241,27 @@ export function useCampForm() {
     });
   }, [data, stepId]);
 
+  // Boys can't register for the kids camp — spots are full. This combination
+  // hard-blocks navigation past the child step and submission.
+  const boysKidsBlocked = data.camp === "kids" && data.childGender === "boy";
+
   // The actual address is conditionally required: only when the
   // "same as declared" toggle is off, the actualAddress must be filled.
   const stepValidWithCond = useMemo(() => {
+    // Hard stop: a boy on the kids camp can't leave the child step.
+    if (boysKidsBlocked && stepId === "child") return false;
     if (!stepValid) return false;
     if (stepId === "child" && !data.actualSameAsDeclared) {
       return isFilled(data.actualAddress);
     }
     return true;
-  }, [stepValid, stepId, data.actualSameAsDeclared, data.actualAddress]);
+  }, [
+    stepValid,
+    stepId,
+    data.actualSameAsDeclared,
+    data.actualAddress,
+    boysKidsBlocked,
+  ]);
 
   const goNext = useCallback(() => {
     setTouched((t) => {
@@ -281,6 +293,13 @@ export function useCampForm() {
   }, []);
 
   const submit = useCallback(async () => {
+    // Hard stop: boys can't register for the kids camp (spots full). Bounce
+    // back to the child step where the explanatory notice lives.
+    if (data.camp === "kids" && data.childGender === "boy") {
+      setStepIdx(STEPS.findIndex((s) => s.id === "child"));
+      scrollToFormTop();
+      return;
+    }
     const errs = validate(data, {}, true);
     if (Object.keys(errs).length > 0) {
       const all: Partial<Record<keyof FormData, boolean>> = {};
@@ -384,6 +403,7 @@ export function useCampForm() {
     stepIdx,
     stepId,
     stepValid: stepValidWithCond,
+    boysKidsBlocked,
     goNext,
     goPrev,
     goTo,
