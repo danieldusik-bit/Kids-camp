@@ -175,6 +175,7 @@ export type FormData = {
   parentName: string;
   parentPhone: string;
   parentEmail: string;
+  parentPersonalCode: string;
   emergencyName: string;
   emergencyPhone: string;
   childName: string;
@@ -222,6 +223,7 @@ export const INITIAL_DATA: FormData = {
   parentName: "",
   parentPhone: "",
   parentEmail: "",
+  parentPersonalCode: "",
   emergencyName: "",
   emergencyPhone: "",
   childName: "",

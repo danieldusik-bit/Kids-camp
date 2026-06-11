@@ -79,6 +79,7 @@ function toApiPayload(data: FormData) {
     parentName: data.parentName,
     parentPhone: data.parentPhone,
     parentEmail: data.parentEmail,
+    parentPersonalId: data.parentPersonalCode,
     emergencyContactName: data.emergencyName,
     emergencyContactPhone: data.emergencyPhone,
     childName: data.childName,

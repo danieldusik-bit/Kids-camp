@@ -45,6 +45,7 @@ export async function POST(request: Request) {
         parentName: body.parentName,
         parentPhone: body.parentPhone,
         parentEmail: body.parentEmail,
+        parentPersonalId: body.parentPersonalId || "",
         emergencyContactName: body.emergencyContactName || "",
         emergencyContactPhone: body.emergencyContactPhone || "",
 

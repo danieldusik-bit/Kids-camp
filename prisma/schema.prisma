@@ -20,6 +20,7 @@ model Registration {
   parentName  String
   parentPhone String
   parentEmail String
+  parentPersonalId String @default("")
 
   // Emergency contact (optional)
   emergencyContactName  String @default("")

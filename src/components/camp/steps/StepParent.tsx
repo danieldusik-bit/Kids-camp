@@ -75,6 +75,15 @@ export function StepParent({
         hint="На этот адрес мы пришлём договор и список вещей."
       />
 
+      <Field
+        id="parentPersonalCode"
+        label="Personas kods родителя"
+        value={data.parentPersonalCode}
+        onChange={(v) => set("parentPersonalCode", v)}
+        placeholder="010203-12345"
+        hint="Латвийский personas kods того, кто подписывает договор. Если укажете — он автоматически впишется в договор (Līgums)."
+      />
+
       <div className="bg-tint rounded-2xl p-5 border border-line">
         <h3 className="font-display text-[19px] font-semibold mt-0 mb-1 text-ink">
           Экстренный контакт

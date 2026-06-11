@@ -16,6 +16,7 @@ interface Registration {
   parentName: string;
   parentPhone: string;
   parentEmail: string;
+  parentPersonalId?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   city: string;
@@ -85,6 +86,7 @@ const EDITABLE_KEYS = [
   "parentName",
   "parentPhone",
   "parentEmail",
+  "parentPersonalId",
   "emergencyContactName",
   "emergencyContactPhone",
   "pickup1Name",
@@ -455,6 +457,7 @@ export default function RegistrationModal({
                     "—"
                   ),
                 })}
+                {EF({ label: "Personas kods родителя", k: "parentPersonalId" })}
                 {EF({ label: "Экстренный контакт", k: "emergencyContactName" })}
                 {EF({
                   label: "Телефон экстренного",

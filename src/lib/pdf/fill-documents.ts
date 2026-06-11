@@ -41,6 +41,7 @@ export type RegistrationForPdf = {
   childGender?: string;
   parentName: string;
   parentPhone: string;
+  parentPersonalId?: string;
   parentEmail?: string;
   declaredAddress?: string;
   actualAddress?: string;
@@ -219,9 +220,10 @@ export async function fillContractPdf(
 
   // Triple-row blanks at y=716, labels at y=702.
   //   (Vārds, Uzvārds)        — underline x≈45-280
-  //   (personas kods)         — underline x≈285-380 (skip)
+  //   (personas kods)         — underline x≈285-380
   //   (dzīvesvietas adrese)   — underline x≈390-560
   drawAt(p1, font, reg.parentName, 50, 718, 10, 220);
+  drawAt(p1, font, reg.parentPersonalId || "", 287, 718, 10, 130);
   // Address blank runs to the right edge of the page; allow ~165pt and fall
   // back to a slightly smaller font for the few addresses that need more.
   const addr = reg.declaredAddress || "";
